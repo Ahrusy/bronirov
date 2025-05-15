@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Список мероприятий{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Фильтры -->
+    <div class="col-md-3 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Фильтры</h5>
+            </div>
+            <div class="card-body">
+                <form method="get">
+                    <div class="mb-3">
+                        <label for="search" class="form-label">Поиск</label>
+                        <input type="text" class="form-control" id="search" name="search" value="{{ request.GET.search }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="genre" class="form-label">Жанр</label>
+                        <select class="form-select" id="genre" name="genre">
+                            <option value="">Все жанры</option>
+                            {% for genre in genres %}
+                            <option value="{{ genre }}" {% if request.GET.genre == genre %}selected{% endif %}>
+                                {{ genre }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="city" class="form-label">Город</label>
+                        <select class="form-select" id="city" name="city">
+                            <option value="">Все города</option>
+                            {% for city in cities %}
+                            <option value="{{ city }}" {% if request.GET.city == city %}selected{% endif %}>
+                                {{ city }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Применить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Список мероприятий -->
+    <div class="col-md-9">
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            {% for event in events %}
+            <div class="col">
+                <div class="card h-100">
+                    {% if event.image %}
+                    <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ event.title }}</h5>
+                        <p class="card-text">{{ event.description|truncatewords:30 }}</p>
+                        <ul class="list-unstyled">
+                            <li><i class="bi bi-calendar"></i> {{ event.event_date }}</li>
+                            <li><i class="bi bi-geo-alt"></i> {{ event.location }}, {{ event.city }}</li>
+                            <li><i class="bi bi-tag"></i> {{ event.genre }}</li>
+                            <li><i class="bi bi-ticket"></i> {{ event.ticket_price }} ₽</li>
+                            <li><i class="bi bi-ticket-perforated"></i> Доступно билетов: {{ event.available_tickets }}</li>
+                        </ul>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{% url 'events:event_detail' event.id %}" class="btn btn-primary">Подробнее</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    Мероприятия не найдены
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Пагинация -->
+        {% if is_paginated %}
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Предыдущая</a>
+                </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                    <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+                </li>
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Следующая</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 
