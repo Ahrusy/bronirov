@@ -17,7 +17,6 @@ DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -27,6 +26,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # 👤 Пользователи
+    'users',
+    # 📅 Мероприятия
+    'events',
+    # 🎟️ Бронирования
+    'booking',
+    # 🤖 Telegram API
+    'bot_api',
+    # 🔄 Импорт событий
+    'event_importer',
 ]
 
 MIDDLEWARE = [
@@ -59,6 +68,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'event_booking.wsgi.application'
 
+
+# КАСТОМНАЯ МОДЕЛЬ ПОЛЬЗОВАТЕЛЯ
+AUTH_USER_MODEL = 'users.User'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
