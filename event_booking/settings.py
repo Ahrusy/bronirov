@@ -70,7 +70,7 @@ WSGI_APPLICATION = 'event_booking.wsgi.application'
 
 
 # КАСТОМНАЯ МОДЕЛЬ ПОЛЬЗОВАТЕЛЯ
-AUTH_USER_MODEL = 'users.User'
+# AUTH_USER_MODEL = 'users.User'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
