@@ -3,9 +3,17 @@ from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator
 from .models import Event
 from .forms import EventFilterForm
+import bleach
 
 def event_list(request):
     events = Event.objects.all().order_by('event_date')
+    for event in events:
+        event.description = bleach.clean(
+            event.description,
+            tags=[],
+            attributes=[],
+            strip=True
+        )
     form = EventFilterForm(request.GET or None)
 
     # Фильтрация
