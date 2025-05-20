@@ -1,5 +1,6 @@
 <!-- templates/events/event_list.html -->
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 <div class="container py-5">
@@ -44,14 +45,18 @@
             </div>
         </form>
     </div>
+    {% if view_type == 'card' %}
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        {% if view_type == 'card' %}
-        {% for event in events %}
+      {% for event in events %}
         <div class="col">
             <div class="card h-100 shadow-sm hover-shadow">
+                <p>{{ event.image }}</p>
                 {% if event.image %}
                       <!-- Изображение загружается из media/event_images/, настроено через MEDIA_URL -->
-                      <img src="{{ event.image.url }}" class="card-img-top img-fluid" alt="{{ event.title|escape }}" style="object-fit: cover; max-height: 200px;">
+                    <img src="{{ event.image.url }}" class="card-img-top img-fluid" alt="{{ event.title|escape }}" style="object-fit: cover; max-width: 640px;">
+                {% else %}
+                    <img src="{% static 'img/genre/' %}{{ event.genre.id }}.jpg" style="max-width: 640px; margin-right: 10px;" alt="{{ event.title|escape }}">
+
                 {% endif %}
                 <div class="card-body">
                     <h5 class="card-title"><h2><a href="{% url 'events:event_detail' event.pk %}">{{ event.title }}</a>
@@ -74,10 +79,14 @@
         </div>
         {% empty %}
         <div class="col-12">
-            <div class="alert alert-info">Пока ещё нет фильмов.</div>
+            <div class="alert alert-info">Мероприятия не найдены.</div>
         </div>
         {% endfor %}
-        {% else %}
+
+    </div>
+    {% else %}
+    <div class="mt-4">
+
         <ul>
             {% for event in events %}
             <li>
@@ -89,9 +98,7 @@
             {% endfor %}
         </ul>
         {% endif %}
-
     </div>
-
 
     {% if is_paginated %}
     <div>
@@ -106,6 +113,7 @@
         {% endif %}
     </div>
     {% endif %}
+</div>
     <!-- Подключение Select2 и скрипт для инициализации -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
