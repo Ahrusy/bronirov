@@ -1,0 +1,29 @@
+<!-- templates/events/event_detail.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ event.title }}</h1>
+
+<p><strong>Дата:</strong> {{ event.event_date }} в {{ event.start_time }}</p>
+<p><strong>Место:</strong> {{ event.location }} ({{ event.city }})</p>
+<p><strong>Жанр:</strong> {{ event.genre }}</p>
+<p><strong>Цена:</strong> {{ event.ticket_price }} ₽</p>
+<p><strong>Билетов осталось:</strong> {{ event.available_tickets }}</p>
+
+{% if event.rules %}
+    <p><strong>Правила:</strong> {{ event.rules }}</p>
+{% endif %}
+{% if event.event_url %}
+    <p><a href="{{ event.event_url }}" target="_blank">Страница мероприятия</a></p>
+{% endif %}
+
+<form action="{% url 'bookings:book_event' event.id %}" method="post">
+    {% csrf_token %}
+    <label>Имя: <input type="text" name="user_name" required></label><br>
+    <label>Email: <input type="email" name="user_email" required></label><br>
+    <label>Telegram: <input type="text" name="user_telegram"></label><br>
+    <button type="submit">Забронировать</button>
+</form>
+
+<a href="{% url 'events:event_list' %}">← Назад к списку</a>
+{% endblock %}

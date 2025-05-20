@@ -1,0 +1,12 @@
+<!-- templates/bookings/booking_success.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Бронирование успешно!</h1>
+
+<p>Спасибо, {{ booking.user_name }}!</p>
+<p>Вы забронировали: <strong>{{ event.title }}</strong> на {{ event.event_date }}</p>
+<p>Мы отправим информацию на ваш email: {{ booking.user_email }}</p>
+
+<a href="{% url 'events:event_list' %}">← Вернуться к мероприятиям</a>
+{% endblock %}
