@@ -15,7 +15,7 @@ def book_event(request, event_id):
             user_telegram=request.POST.get('user_telegram')
         )
         messages.success(request, 'Бронирование успешно выполнено!')
-        return render(request, 'bookings/booking_success.html', {
+        return render(request, 'booking/booking_success.html', {
             'event': event,
             'booking': booking
         })
