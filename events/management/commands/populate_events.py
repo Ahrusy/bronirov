@@ -6,6 +6,11 @@ import datetime
 from django.core.files.base import ContentFile
 from django.db import transaction
 from events.models import City, Location, Genre, Event
+import pytz
+
+# Определяем разумный диапазон дат
+MIN_TIMESTAMP = 0  # 1970-01-01 (начало эпохи UNIX)
+MAX_TIMESTAMP = 4102444800  # 2100-01-01
 
 class Command(BaseCommand):
     help = 'Populate database with events from KudaGo API'
@@ -28,14 +33,20 @@ class Command(BaseCommand):
 
         # Загружаем города
         self.stdout.write('Populating cities...')
-        cities_response = requests.get(f'{BASE_URL}/locations/?lang=ru')
+        cities_response = requests.get(f'{BASE_URL}/locations/')
         if cities_response.status_code == 200:
             cities = cities_response.json()
+            cities.append({'slug': 'online', 'name': 'Online'})
             for city_data in cities:
-                City.objects.get_or_create(
-                    name=city_data['name'],
-                    defaults={'name': city_data['name']}
+                city,created = City.objects.get_or_create(
+                    slug=city_data['slug'],
+                    defaults={'name': city_data['name']},
                 )
+                if created:
+                    self.stdout.write(self.style.SUCCESS(f'Создан город: {city.name} ({city.slug})'))
+                else:
+                    self.stdout.write(f'Город уже существует: {city.name} ({city.slug})')
+
             self.stdout.write(self.style.SUCCESS(f'Successfully populated {len(cities)} cities'))
         else:
             self.stdout.write(self.style.ERROR('Failed to fetch cities'))
@@ -50,13 +61,17 @@ class Command(BaseCommand):
         self.stdout.write('Populating events...')
         page = 1
         while True:
+            tz=pytz.timezone('Europe/Moscow')
+            current_time = datetime.datetime.now(tz).astimezone(pytz.UTC)
+            unix_timestamp = int(current_time.timestamp())
             events_response = requests.get(
                 f'{BASE_URL}/events/',
                 params={
                     'lang': 'ru',
                     'fields': 'id,title,description,dates,location,place,categories,price,images,body_text,site_url',
                     'page': page,
-                    'page_size': 100
+                    'page_size': 100,
+                    'actual_since': unix_timestamp,
                 }
             )
             if events_response.status_code != 200:
@@ -72,8 +87,8 @@ class Command(BaseCommand):
                 for event_data in results:
                     try:
                         # Получение города
-                        city_name = event_data.get('location', {}).get('name', 'Unknown')
-                        city, _ = City.objects.get_or_create(name=city_name)
+                        city_name = event_data.get('location', {}).get('slug', 'Unknown')
+                        city, _ = City.objects.get_or_create(slug=city_name)
 
                         # Получение места проведения
                         place_data = event_data.get('place') or {}
@@ -97,7 +112,7 @@ class Command(BaseCommand):
                         # Обработка даты и времени
                         dates = (event_data.get('dates') or [{}])
                         start_ts = dates[0].get('start', 0)
-                        if start_ts:
+                        if start_ts>0:
                             start_date = datetime.datetime.fromtimestamp(start_ts, tz=datetime.timezone.utc)
                             event_date = start_date.date()
                             start_time = start_date.time()
@@ -155,7 +170,8 @@ class Command(BaseCommand):
                             self.stdout.write(self.style.SUCCESS(f'Created event: {event.title}'))
                         else:
                             self.stdout.write(f'Event already exists: {event.title}')
-
+                    except City.DoesNotExist:
+                        self.stdout.write(f"Город с slug '{city_slug}' не найден. Пропускаем событие: {event_data.get('title', 'Unknown')}")
                     except Exception as e:
                         self.stdout.write(self.style.ERROR(f'Error processing event {event_data.get("title")}: {str(e)}'))
 

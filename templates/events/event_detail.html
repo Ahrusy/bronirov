@@ -11,7 +11,7 @@
 <p><strong>Билетов осталось:</strong> {{ event.available_tickets }}</p>
 
 {% if event.rules %}
-    <p><strong>Правила:</strong> {{ event.rules }}</p>
+    <p><strong>Правила:</strong> {{ event.rules|safe }}</p>
 {% endif %}
 {% if event.event_url %}
     <p><a href="{{ event.event_url }}" target="_blank">Страница мероприятия</a></p>
