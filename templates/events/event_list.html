@@ -47,15 +47,15 @@
     </div>
     {% if view_type == 'card' %}
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-      {% for event in events %}
+        {% for event in events %}
         <div class="col">
             <div class="card h-100 shadow-sm hover-shadow">
-                <p>{{ event.image }}</p>
                 {% if event.image %}
-                      <!-- Изображение загружается из media/event_images/, настроено через MEDIA_URL -->
-                    <img src="{{ event.image.url }}" class="card-img-top img-fluid" alt="{{ event.title|escape }}" style="object-fit: cover; max-width: 640px;">
+                <!-- Изображение загружается из media/event_images/, настроено через MEDIA_URL -->
+                <img src="{{ event.image.url }}" class="card-img-top img-fluid text-center"
+                     alt="{{ event.title|escape }}" style="object-fit: cover; max-width: 640px;" alt="{{ event.title|escape }}>
                 {% else %}
-                    <img src="{% static 'img/genre/' %}{{ event.genre.id }}.jpg" style="max-width: 640px; margin-right: 10px;" alt="{{ event.title|escape }}">
+                    <img src="{% static 'img/genre/' %}{{ event.genre.id }}.jpg" class="card-img-top img-fluid text-center" style="object-fit: cover; max-width: 640px;" alt="{{ event.title|escape }}">
 
                 {% endif %}
                 <div class="card-body">
@@ -101,54 +101,54 @@
     </div>
 
     {% if is_paginated %}
-    <div>
+    <div class="mt-4 text-center">
         {% if events.has_previous %}
-        <a href="?page={{ events.previous_page_number }}">Назад</a>
+        <a href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ events.previous_page_number }}"
+           class="btn btn-outline-primary btn-sm me-2">Назад</a>
         {% endif %}
-
         <span>Страница {{ events.number }} из {{ events.paginator.num_pages }}</span>
-
         {% if events.has_next %}
-        <a href="?page={{ events.next_page_number }}">Вперёд</a>
+        <a href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ events.next_page_number }}"
+           class="btn btn-outline-primary btn-sm ms-2">Вперёд</a>
         {% endif %}
     </div>
     {% endif %}
 </div>
-    <!-- Подключение Select2 и скрипт для инициализации -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('.select2').select2({
-                placeholder: "Выберите значения",
-                allowClear: true,
-                closeOnSelect: false, // Оставляет список открытым после выбора
-                templateResult: function(data) {
-                    // Добавляем чекбоксы в выпадающий список
-                    if (!data.id) {
-                        return data.text;
-                    }
-                    var $state = $(
-                        '<span><input type="checkbox" class="select2-checkbox" ' + (data.selected ? 'checked' : '') + ' /> ' + data.text + '</span>'
-                    );
-                    return $state;
-                },
-                templateSelection: function(data) {
-                    // Отображаем выбранные элементы
-                    return data.text || data.id;
+<!-- Подключение Select2 и скрипт для инициализации -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.select2').select2({
+            placeholder: "Выберите значения",
+            allowClear: true,
+            closeOnSelect: false, // Оставляет список открытым после выбора
+            templateResult: function(data) {
+                // Добавляем чекбоксы в выпадающий список
+                if (!data.id) {
+                    return data.text;
                 }
-            });
-
-            // Синхронизация чекбоксов с выбором
-            $('.select2').on('select2:selecting', function(e) {
-                var $option = $(e.params.args.data.element);
-                $option.prop('selected', !$option.prop('selected'));
-            });
+                var $state = $(
+                    '<span><input type="checkbox" class="select2-checkbox" ' + (data.selected ? 'checked' : '') + ' /> ' + data.text + '</span>'
+                );
+                return $state;
+            },
+            templateSelection: function(data) {
+                // Отображаем выбранные элементы
+                return data.text || data.id;
+            }
         });
-    </script>
 
-    <!-- Подключение Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    {% endblock %}
+        // Синхронизация чекбоксов с выбором
+        $('.select2').on('select2:selecting', function(e) {
+            var $option = $(e.params.args.data.element);
+            $option.prop('selected', !$option.prop('selected'));
+        });
+    });
+</script>
+
+<!-- Подключение Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% endblock %}

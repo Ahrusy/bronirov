@@ -21,36 +21,35 @@ def event_list(request):
             strip=True
         )
     form = EventFilterForm(request.GET or None)
-    # Фильтрация через форму
-    if form.is_valid():
-        cities = form.cleaned_data.get('cities')
-        genres = form.cleaned_data.get('genres')
-        date_from = form.cleaned_data.get('date_from')
-        date_to = form.cleaned_data.get('date_to')
+    cities = [city for city in request.GET.getlist('cities') if city]
+    genres = [genre for genre in request.GET.getlist('genres') if genre]
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
 
-        if cities:
-            events = events.filter(location__city__in=cities)
-        if genres:
-            events = events.filter(genre__in=genres)
-        if date_from:
+    if cities:
+        try:
+            cities = [int(city) for city in cities]
+            events = events.filter(location__city__id__in=cities)
+        except (ValueError, TypeError):
+            pass  # Игнорируем невалидные ID городов
+    if genres:
+        try:
+            genres = [int(genre) for genre in genres]
+            events = events.filter(genre__id__in=genres)
+        except (ValueError, TypeError):
+            pass  # Игнорируем невалидные ID жанров
+    if date_from:
+        try:
             events = events.filter(event_date__gte=date_from)
-        if date_to:
+        except ValueError:
+            pass  # Игнорируем невалидный формат даты
+    if date_to:
+        try:
             events = events.filter(event_date__lte=date_to)
+        except ValueError:
+            pass  # Игнорируем невалидный формат даты
 
 
-    # search = request.GET.get('search', '')
-    # genre = request.GET.get('genre', '')
-    # city = request.GET.get('city', '')
-
-    # if search:
-    #     events = events.filter(title__icontains=search)
-    # if genre:
-    #     events = events.filter(genre=genre)
-    # if city:
-    #     events = events.filter(city=city)
-
-    # genres = Event.objects.values_list('genre', flat=True).distinct()
-    # cities = Event.objects.values_list('city', flat=True).distinct()
 
     # view_type = request.GET.get('view', 'card')  # По умолчанию карточки
     # if view_type not in ['card', 'table']:
