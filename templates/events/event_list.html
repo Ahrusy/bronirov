@@ -53,14 +53,14 @@
                 {% if event.image %}
                 <!-- Изображение загружается из media/event_images/, настроено через MEDIA_URL -->
                 <img src="{{ event.image.url }}" class="card-img-top img-fluid text-center"
-                     alt="{{ event.title|escape }}" style="object-fit: cover; max-width: 640px;" alt="{{ event.title|escape }}>
+                     alt="{{ event.title|escape }}" style="object-fit: cover; max-width: 640px;">
                 {% else %}
-                    <img src="{% static 'img/genre/' %}{{ event.genre.id }}.jpg" class="card-img-top img-fluid text-center" style="object-fit: cover; max-width: 640px;" alt="{{ event.title|escape }}">
+                <img src="{% static 'img/genre/' %}{{ event.genre.id }}.jpg" class="card-img-top img-fluid text-center"
+                     style="object-fit: cover; max-width: 640px;" alt="{{ event.title|escape }}">
 
                 {% endif %}
                 <div class="card-body">
-                    <h5 class="card-title"><h2><a href="{% url 'events:event_detail' event.pk %}">{{ event.title }}</a>
-                    </h2></h5>
+                    <h5 class="card-title"><a href="{% url 'events:event_detail' event.pk %}">{{ event.title }}</a></h5>
                     <p class="card-text text-truncate">{{ event.description }}</p>
                     <div class="d-flex justify-content-between align-items-center">
                         <small class="text-muted">
@@ -91,24 +91,23 @@
             {% for event in events %}
             <li>
                 <h2><a href="{% url 'events:event_detail' event.pk %}">{{ event.title }}</a></h2>
-                <p><strong>{{ event.city }}</strong> | {{ event.genre }} | {{ event.event_date }}</p>
+                <p><strong>{{ event.city }}</strong> | {{ event.genre }} | {{ event.event_date|date:"d.m.Y" }}</p>
             </li>
             {% empty %}
             <li>Мероприятия не найдены.</li>
             {% endfor %}
         </ul>
-        {% endif %}
     </div>
-
+    {% endif %}
     {% if is_paginated %}
     <div class="mt-4 text-center">
         {% if events.has_previous %}
-        <a href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ events.previous_page_number }}"
+        <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value|urlencode }}&{% endif %}{% endfor %}page={{ events.previous_page_number }}"
            class="btn btn-outline-primary btn-sm me-2">Назад</a>
         {% endif %}
         <span>Страница {{ events.number }} из {{ events.paginator.num_pages }}</span>
         {% if events.has_next %}
-        <a href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ events.next_page_number }}"
+        <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value|urlencode }}&{% endif %}{% endfor %}page={{ events.next_page_number }}"
            class="btn btn-outline-primary btn-sm ms-2">Вперёд</a>
         {% endif %}
     </div>

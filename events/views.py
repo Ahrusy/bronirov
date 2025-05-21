@@ -1,6 +1,8 @@
 # events/views.py
+import sys
 from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator
+from django.utils.html import strip_tags
 from .models import Event
 from .forms import EventFilterForm
 import bleach
@@ -13,13 +15,6 @@ def event_list(request):
         view_type = 'card'
 
     events = Event.objects.all().order_by('event_date')
-    for event in events:
-        event.description = bleach.clean(
-            event.description,
-            tags=[],
-            attributes=[],
-            strip=True
-        )
     form = EventFilterForm(request.GET or None)
     cities = [city for city in request.GET.getlist('cities') if city]
     genres = [genre for genre in request.GET.getlist('genres') if genre]
@@ -49,15 +44,13 @@ def event_list(request):
         except ValueError:
             pass  # Игнорируем невалидный формат даты
 
-
-
-    # view_type = request.GET.get('view', 'card')  # По умолчанию карточки
-    # if view_type not in ['card', 'table']:
-    #     view_type = 'card'
-
     paginator = Paginator(events, 6)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+
+    for event in page_obj:
+        print(bleach.clean(event.description, tags=[], attributes={}, strip=True))
+        event.description = strip_tags(event.description)
 
     context = {
         'page_title': 'Главная страница',
