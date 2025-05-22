@@ -1,12 +1,14 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Личный кабинет</h2>
-<p>Пользователь: {{ request.user.username }}</p>
-<p>Email: {{ request.user.email }}</p>
-{% if request.user.profile.is_telegram_verified %}
+<div class="container py-5">
+    <h2>Личный кабинет</h2>
+    <p>Пользователь: {{ request.user.username }}</p>
+    <p>Email: {{ request.user.email }}</p>
+    {% if request.user.profile.is_telegram_verified %}
     <p style="color:green">Telegram привязан</p>
-{% else %}
+    {% else %}
     <p style="color:red">Telegram не привязан</p>
-    <a href="{% url 'telegram_qr' %}">Привязать Telegram</a>
-{% endif %}
+    {# <a href="{% url 'telegram_qr' %}">Привязать Telegram</a> #}
+    {% endif %}
+</div>
 {% endblock %}

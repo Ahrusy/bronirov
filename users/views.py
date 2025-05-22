@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
@@ -41,3 +41,8 @@ def edit_profile(request):
             'form': form
         }
     return render(request, 'registration/edit_profile.html', context=context)
+
+@login_required
+def logout_user(request):
+    logout(request)
+    return redirect('events:event_list')
