@@ -49,8 +49,7 @@ def event_list(request):
     page_obj = paginator.get_page(page_number)
 
     for event in page_obj:
-        print(bleach.clean(event.description, tags=[], attributes={}, strip=True))
-        event.description = strip_tags(event.description)
+        event.description = strip_tags(event.description[:150])
 
     context = {
         'page_title': 'Главная страница',
