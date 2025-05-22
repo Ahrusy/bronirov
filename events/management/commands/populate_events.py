@@ -112,13 +112,12 @@ class Command(BaseCommand):
                         # Обработка даты и времени
                         dates = (event_data.get('dates') or [{}])
                         start_ts = dates[0].get('start', 0)
-                        if start_ts>0:
-                            start_date = datetime.datetime.fromtimestamp(start_ts, tz=datetime.timezone.utc)
-                            event_date = start_date.date()
-                            start_time = start_date.time()
-                        else:
-                            event_date = None
-                            start_time = None
+                        if start_ts<0:
+                            start_ts = dates[0].get('end', 0)
+
+                        start_date = datetime.datetime.fromtimestamp(start_ts, tz=datetime.timezone.utc)
+                        event_date = start_date.date()
+                        start_time = start_date.time()
 
                         # Обработка цены
                         price = event_data.get('price', '0.00')
