@@ -5,6 +5,7 @@ to maintain consistency in templates and views.
 """
 
 import datetime
+from django.urls import reverse, NoReverseMatch
 
 # Shared site data
 SITE_INFO = {
@@ -14,13 +15,13 @@ SITE_INFO = {
 
 # Base menu structure
 DEFAULT_MENU = [
-    {'title': 'События', 'url': '/', 'active': False, 'login_required': None},
-    {'title': 'Профиль', 'url': '/accounts/profile/', 'active': False, 'login_required': True},
-    {'title': 'Забронировано', 'url': '/booked/', 'active': False, 'login_required': True},
-    {'title': 'Выход', 'url': '/accounts/logout/', 'active': False, 'login_required': True},
-    {'title': 'Регистрация', 'url': '/accounts/register/', 'active': False, 'login_required': False},
-    {'title': 'Вход', 'url': '/accounts/login/', 'active': False, 'login_required': False},
-    {'title': 'Контакты', 'url': '/contacts/', 'active': False, 'login_required': None},
+    {'title': 'События', 'url': 'events:event_list', 'active': False, 'login_required': None},
+    {'title': 'Профиль', 'url': 'users:profile', 'active': False, 'login_required': True},
+    {'title': 'Забронировано', 'url': 'users:booked', 'active': False, 'login_required': True},
+    {'title': 'Выход', 'url': 'users:logout', 'active': False, 'login_required': True},
+    {'title': 'Регистрация', 'url': 'users:register', 'active': False, 'login_required': False},
+    {'title': 'Вход', 'url': 'users:login', 'active': False, 'login_required': False},
+    {'title': 'Контакты', 'url': 'contacts:contacts', 'active': False, 'login_required': None},
 ]
 
 # Footer data
@@ -53,6 +54,15 @@ def get_base_context(request):
 
     # Set active menu item
     for item in menu_items:
+        try:
+            # Получаем URL по имени
+            item['url'] = reverse(item['url'])
+        except NoReverseMatch:
+            # Если имя URL не найдено, оставляем пустой URL и логируем ошибку
+            print(f"Warning: No reverse match for {item['url']}")
+            item['url'] = '#'
+
+
         if item['url'] == '/':
             if request.path == '/':
                 item['active'] = True
