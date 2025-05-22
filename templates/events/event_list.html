@@ -1,48 +1,45 @@
-<!-- templates/events/event_list.html -->
 {% extends "base.html" %}
 
-{% block content %}
-<h1>Список мероприятий</h1>
+{% block title %}Афиша мероприятий{% endblock %}
 
-<form method="get">
-    <input type="text" name="search" placeholder="Поиск..." value="{{ request.GET.search }}">
+{% block content %}
+<form method="get" class="filter-form mb-4">
+    <label>Дата с:</label>
+    <input type="date" name="date_from" value="{{ filters.date_from }}"/>
+
+    <label>по:</label>
+    <input type="date" name="date_to" value="{{ filters.date_to }}"/>
+
+    <label>Жанр:</label>
     <select name="genre">
-        <option value="">Все жанры</option>
+        <option value="">Все</option>
         {% for g in genres %}
-            <option value="{{ g }}" {% if g == request.GET.genre %}selected{% endif %}>{{ g }}</option>
+            <option value="{{ g.name }}" {% if filters.genre == g.name %}selected{% endif %}>{{ g.name }}</option>
         {% endfor %}
     </select>
+
+    <label>Город:</label>
     <select name="city">
-        <option value="">Все города</option>
+        <option value="">Все</option>
         {% for c in cities %}
-            <option value="{{ c }}" {% if c == request.GET.city %}selected{% endif %}>{{ c }}</option>
+            <option value="{{ c.name }}" {% if filters.city == c.name %}selected{% endif %}>{{ c.name }}</option>
         {% endfor %}
     </select>
-    <button type="submit">Фильтровать</button>
+
+    <button type="submit" class="btn btn-primary">Применить</button>
 </form>
 
-<ul>
+{% if events %}
+    <ul class="list-group">
     {% for event in events %}
-    <li>
-        <h2><a href="{% url 'events:event_detail' event.pk %}">{{ event.title }}</a></h2>
-        <p><strong>{{ event.city }}</strong> | {{ event.genre }} | {{ event.event_date }}</p>
-    </li>
-    {% empty %}
-    <li>Мероприятия не найдены.</li>
+        <li class="list-group-item mb-2">
+            <a href="{% url 'events:event_detail' event.pk %}"><strong>{{ event.title }}</strong></a><br>
+            <span>{{ event.event_date }} | {{ event.city }} | {{ event.genre }}</span><br>
+            <span>Цена: {{ event.ticket_price }} ₽</span> | <span>Осталось: {{ event.available_tickets }}</span>
+        </li>
     {% endfor %}
-</ul>
-
-{% if is_paginated %}
-<div>
-    {% if events.has_previous %}
-        <a href="?page={{ events.previous_page_number }}">Назад</a>
-    {% endif %}
-
-    <span>Страница {{ events.number }} из {{ events.paginator.num_pages }}</span>
-
-    {% if events.has_next %}
-        <a href="?page={{ events.next_page_number }}">Вперёд</a>
-    {% endif %}
-</div>
+    </ul>
+{% else %}
+    <p>Нет мероприятий по выбранным фильтрам.</p>
 {% endif %}
 {% endblock %}

@@ -9,4 +9,17 @@
     <p style="color:red">Telegram не привязан</p>
     <a href="{% url 'telegram_qr' %}">Привязать Telegram</a>
 {% endif %}
+<h3>Мои бронирования</h3>
+{% if bookings %}
+    <ul class="list-group mb-3">
+    {% for booking in bookings %}
+        <li class="list-group-item">
+            <strong>{{ booking.event.title }}</strong> — {{ booking.event.event_date }}<br>
+            Кол-во билетов: {{ booking.ticket_count }}
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Нет бронирований.</p>
+{% endif %}
 {% endblock %}

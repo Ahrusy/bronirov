@@ -7,7 +7,9 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('events.urls', namespace='events')),
-    path('', include('booking.urls', namespace='booking')),
+    path('booking/', include('booking.urls', namespace='booking')),
+    path('users/', include('users.urls')),
+    path('api/', include('bot_api.urls')),  # например, http://localhost:8000/api/telegram/validate/
 ]
 
 if settings.DEBUG:

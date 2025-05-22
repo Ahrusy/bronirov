@@ -4,9 +4,11 @@
 {% block content %}
 <h1>Бронирование успешно!</h1>
 
-<p>Спасибо, {{ booking.user_name }}!</p>
+<p>Спасибо, {{ request.user.username }}!</p>
 <p>Вы забронировали: <strong>{{ event.title }}</strong> на {{ event.event_date }}</p>
-<p>Мы отправим информацию на ваш email: {{ booking.user_email }}</p>
+{% if request.user.email %}
+<p>Мы отправим информацию на ваш email: {{ request.user.email }}</p>
+{% endif %}
 
 <a href="{% url 'events:event_list' %}">← Вернуться к мероприятиям</a>
 {% endblock %}

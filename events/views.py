@@ -1,35 +1,51 @@
-# events/views.py
 from django.shortcuts import render, get_object_or_404
-from django.core.paginator import Paginator
-from .models import Event
+from .models import Event, Genre, City
+from django.db.models import Q
+from datetime import datetime, date
 
 def event_list(request):
-    events = Event.objects.all().order_by('event_date')
+    events = Event.objects.select_related('genre', 'city', 'location').filter(is_imported=True).order_by('event_date')
 
-    # Фильтрация
-    search = request.GET.get('search', '')
-    genre = request.GET.get('genre', '')
-    city = request.GET.get('city', '')
+    # Получаем параметры
+    date_from = request.GET.get('date_from', '').strip()
+    date_to = request.GET.get('date_to', '').strip()
+    genre = request.GET.get('genre', '').strip()
+    city = request.GET.get('city', '').strip()
 
-    if search:
-        events = events.filter(title__icontains=search)
+    # Применяем фильтры, только если значения не пустые
+    if date_from:
+        try:
+            date_obj = datetime.strptime(date_from, '%Y-%m-%d').date()
+            events = events.filter(event_date__gte=date_obj)
+        except ValueError:
+            pass
+
+    if date_to:
+        try:
+            date_obj = datetime.strptime(date_to, '%Y-%m-%d').date()
+            events = events.filter(event_date__lte=date_obj)
+        except ValueError:
+            pass
+
     if genre:
-        events = events.filter(genre=genre)
+        events = events.filter(genre__name__icontains=genre)
+
     if city:
-        events = events.filter(city=city)
+        events = events.filter(city__name__icontains=city)
 
-    genres = Event.objects.values_list('genre', flat=True).distinct()
-    cities = Event.objects.values_list('city', flat=True).distinct()
-
-    paginator = Paginator(events, 6)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    genres = Genre.objects.all()
+    cities = City.objects.all()
 
     return render(request, 'events/event_list.html', {
-        'events': page_obj,
+        'events': events,
         'genres': genres,
         'cities': cities,
-        'is_paginated': page_obj.has_other_pages(),
+        'filters': {
+            'date_from': date_from,
+            'date_to': date_to,
+            'genre': genre,
+            'city': city,
+        }
     })
 
 def event_detail(request, pk):
