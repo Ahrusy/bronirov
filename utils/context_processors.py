@@ -15,13 +15,13 @@ SITE_INFO = {
 
 # Base menu structure
 DEFAULT_MENU = [
-    {'title': 'События', 'url': 'events:event_list', 'active': False, 'login_required': None},
-    {'title': 'Профиль', 'url': 'users:profile', 'active': False, 'login_required': True},
-    {'title': 'Забронировано', 'url': 'users:booked', 'active': False, 'login_required': True},
-    {'title': 'Выход', 'url': 'users:logout', 'active': False, 'login_required': True},
-    {'title': 'Регистрация', 'url': 'users:register', 'active': False, 'login_required': False},
-    {'title': 'Вход', 'url': 'users:login', 'active': False, 'login_required': False},
-    {'title': 'Контакты', 'url': 'contacts:contacts', 'active': False, 'login_required': None},
+    {'title': 'События', 'url_name': 'events:event_list', 'active': False, 'login_required': None},
+    {'title': 'Профиль', 'url_name': 'users:profile', 'active': False, 'login_required': True},
+    {'title': 'Забронировано', 'url_name': 'users:booked', 'active': False, 'login_required': True},
+    {'title': 'Выход', 'url_name': 'users:logout', 'active': False, 'login_required': True},
+    {'title': 'Регистрация', 'url_name': 'users:register', 'active': False, 'login_required': False},
+    {'title': 'Вход', 'url_name': 'users:login', 'active': False, 'login_required': False},
+    {'title': 'Контакты', 'url_name': 'contacts:contacts', 'active': False, 'login_required': None},
 ]
 
 # Footer data
@@ -56,10 +56,10 @@ def get_base_context(request):
     for item in menu_items:
         try:
             # Получаем URL по имени
-            item['url'] = reverse(item['url'])
+            item['url'] = reverse(item['url_name'])
         except NoReverseMatch:
             # Если имя URL не найдено, оставляем пустой URL и логируем ошибку
-            print(f"Warning: No reverse match for {item['url']}")
+            print(f"Warning: No reverse match for {item['url_name']}")
             item['url'] = '#'
 
 
