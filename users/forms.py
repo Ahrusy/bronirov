@@ -1,11 +1,16 @@
 # users/forms.py
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
+from .models import UserProfile
 
-class CustomUserRegistrationForm(UserCreationForm):
-    email = forms.EmailField(required=True, label='Email')
-
+class ProfileForm(forms.ModelForm):
     class Meta:
-        model = User
-        fields = ['username', 'email', 'password1', 'password2']
+        model = UserProfile
+        fields = ['phone', 'telegram_chat_id']
+        labels = {
+            'phone': 'Телефон',
+            'telegram_chat_id': 'Telegram ID',
+        }
+        widgets = {
+            'phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'telegram_chat_id': forms.TextInput(attrs={'class': 'form-control'}),
+        }
