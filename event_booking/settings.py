@@ -27,7 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # 👤 Пользователи
-    'users.apps.UsersConfig',
+    'users',
     # 📅 Мероприятия
     'events',
     # 🎟️ Бронирования
