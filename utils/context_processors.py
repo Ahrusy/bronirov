@@ -14,13 +14,10 @@ SITE_INFO = {
 
 # Base menu structure
 DEFAULT_MENU = [
-    {'title': 'События', 'url': '/', 'active': False},
-    {'title': 'Профмль', 'url': '/profile/', 'active': False},
-    {'title': 'Забронировано', 'url': '/booked/', 'active': False},
-    {'title': 'Выход', 'url': '/logout/', 'active': False},
-    {'title': 'Регистрация', 'url': '/register/', 'active': False},
-    {'title': 'Вход', 'url': '/login/', 'active': False},
-    {'title': 'Контакты', 'url': '/contacts/', 'active': False},
+    {'title': 'Афиша событий', 'url': '/', 'active': False},
+    {'title': 'Мои билеты', 'url': '/booked/', 'active': False},
+    {'title': 'Профиль', 'url': '/profile/', 'active': False, 'type': 'profile'},
+    {'title': 'Связаться с нами', 'url': '/contacts/', 'active': False},
 ]
 
 # Footer data

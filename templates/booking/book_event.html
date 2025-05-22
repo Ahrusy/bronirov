@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Бронирование билета на "{{ event.title }}"</h2>
+    {% if error_message %}
+        <div class="alert alert-danger">{{ error_message }}</div>
+    {% endif %}
+    <form method="post" class="mt-4">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="id_user_name" class="form-label">Имя</label>
+            {{ form.user_name|as_widget(attrs={'class': 'form-control'}) }}
+        </div>
+        <div class="mb-3">
+            <label for="id_user_email" class="form-label">Email</label>
+            {{ form.user_email|as_widget(attrs={'class': 'form-control'}) }}
+        </div>
+        <div class="mb-3">
+            <label for="id_user_telegram" class="form-label">Telegram (username, опционально)</label>
+            {{ form.user_telegram|as_widget(attrs={'class': 'form-control'}) }}
+        </div>
+        <button type="submit" class="btn btn-success">Забронировать</button>
+    </form>
+</div>
+{% endblock %} 

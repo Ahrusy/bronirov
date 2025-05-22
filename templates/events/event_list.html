@@ -3,152 +3,112 @@
 {% load static %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row mb-4">
-        <div class="col-12">
-            <h1 class="display-4">{{ page_title }}</h1>
-            <p class="lead text-muted">{{ page_description }}</p>
-            <hr class="my-4">
+<div class="container py-4">
+    <div class="row mb-3">
+        <div class="col-12 text-center">
+            <h1 class="display-6 fw-bold text-primary mb-1">{{ page_title }}</h1>
+            <p class="lead text-muted mb-2">{{ page_description }}</p>
+            <hr class="my-3">
         </div>
     </div>
-    <div class="container mt-4">
-        <h1>Мероприятия</h1>
-        <div class="mb-3">
-            <div class="btn-group" role="group">
-                <a href="?{% if request.GET.cities %}cities={{ request.GET.cities|join:'&cities=' }}&{% endif %}{% if request.GET.genres %}genres={{ request.GET.genres|join:'&genres=' }}&{% endif %}{% if request.GET.date_from %}date_from={{ request.GET.date_from }}&{% endif %}{% if request.GET.date_to %}date_to={{ request.GET.date_to }}&{% endif %}{% if request.GET.page %}page={{ request.GET.page }}&{% endif %}view=card"
-                   class="btn {% if view_type == 'card' %}btn-primary{% else %}btn-outline-primary{% endif %}">Карточки</a>
-                <a href="?{% if request.GET.cities %}cities={{ request.GET.cities|join:'&cities=' }}&{% endif %}{% if request.GET.genres %}genres={{ request.GET.genres|join:'&genres=' }}&{% endif %}{% if request.GET.date_from %}date_from={{ request.GET.date_from }}&{% endif %}{% if request.GET.date_to %}date_to={{ request.GET.date_to }}&{% endif %}{% if request.GET.page %}page={{ request.GET.page }}&{% endif %}view=list"
-                   class="btn {% if view_type == 'list' %}btn-primary{% else %}btn-outline-primary{% endif %}">Список</a>
+    <div class="mb-3">
+        <button class="btn btn-outline-primary btn-sm mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#filterPanel" aria-expanded="false" aria-controls="filterPanel">
+            <i class="bi bi-funnel"></i> Фильтры
+        </button>
+        <div class="collapse" id="filterPanel">
+            <div class="card card-body mb-3">
+                {% include 'events/_event_filter_form.html' %}
             </div>
         </div>
-        <form method="get" class="mb-4">
-            <div class="row">
-                <div class="col-md-3">
-                    <label for="{{ form.cities.id_for_label }}" class="form-label">Города</label>
-                    {{ form.cities }}
-                </div>
-                <div class="col-md-3">
-                    <label for="{{ form.genres.id_for_label }}" class="form-label">Жанры</label>
-                    {{ form.genres }}
-                </div>
-                <div class="col-md-2">
-                    <label for="{{ form.date_from.id_for_label }}" class="form-label">Дата от</label>
-                    {{ form.date_from }}
-                </div>
-                <div class="col-md-2">
-                    <label for="{{ form.date_to.id_for_label }}" class="form-label">Дата до</label>
-                    {{ form.date_to }}
-                </div>
-                <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary">Фильтровать</button>
-                </div>
-            </div>
-        </form>
     </div>
-    {% if view_type == 'card' %}
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-      {% for event in events %}
-        <div class="col">
-            <div class="card h-100 shadow-sm hover-shadow">
-                <p>{{ event.image }}</p>
-                {% if event.image %}
-                      <!-- Изображение загружается из media/event_images/, настроено через MEDIA_URL -->
-                    <img src="{{ event.image.url }}" class="card-img-top img-fluid" alt="{{ event.title|escape }}" style="object-fit: cover; max-width: 640px;">
-                {% else %}
-                    <img src="{% static 'img/genre/' %}{{ event.genre.id }}.jpg" style="max-width: 640px; margin-right: 10px;" alt="{{ event.title|escape }}">
 
-                {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title"><h2><a href="{% url 'events:event_detail' event.pk %}">{{ event.title }}</a>
-                    </h2></h5>
-                    <p class="card-text text-truncate">{{ event.description }}</p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <small class="text-muted">
-                            {{ event.event_date|date:"d.m.Y" }}
-                        </small>
-                        <small class="text-muted">
-                            {{ event.city }} {{ event.genre }}
-                        </small>
-                    </div>
+    <!-- Блок: Ближайшие мероприятия -->
+    <div class="mb-5">
+        <h2 class="h4 fw-bold text-success mb-3"><i class="bi bi-clock-history"></i> Ближайшие мероприятия</h2>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-3">
+            {% for event in upcoming_events|slice:"0:5" %}
+                <div class="col">
+                    {% include 'events/_event_card.html' %}
                 </div>
-                <div class="card-footer bg-transparent border-top-0">
-                    <a href="{% url 'events:event_detail' event.id %}"
-                       class="btn btn-sm btn-outline-primary stretched-link">Читать полностью</a>
-                </div>
-            </div>
-        </div>
-        {% empty %}
-        <div class="col-12">
-            <div class="alert alert-info">Мероприятия не найдены.</div>
-        </div>
-        {% endfor %}
-
-    </div>
-    {% else %}
-    <div class="mt-4">
-
-        <ul>
-            {% for event in events %}
-            <li>
-                <h2><a href="{% url 'events:event_detail' event.pk %}">{{ event.title }}</a></h2>
-                <p><strong>{{ event.city }}</strong> | {{ event.genre }} | {{ event.event_date }}</p>
-            </li>
             {% empty %}
-            <li>Мероприятия не найдены.</li>
+                <div class="col-12"><div class="alert alert-info">Нет ближайших мероприятий.</div></div>
             {% endfor %}
-        </ul>
-        {% endif %}
+        </div>
+        <div class="text-end mt-2">
+            <a href="?upcoming=1" class="btn btn-outline-primary btn-sm">Показать все</a>
+        </div>
     </div>
 
-    {% if is_paginated %}
-    <div>
-        {% if events.has_previous %}
-        <a href="?page={{ events.previous_page_number }}">Назад</a>
-        {% endif %}
-
-        <span>Страница {{ events.number }} из {{ events.paginator.num_pages }}</span>
-
-        {% if events.has_next %}
-        <a href="?page={{ events.next_page_number }}">Вперёд</a>
-        {% endif %}
+    <!-- Блок: Платные мероприятия -->
+    <div class="mb-5">
+        <h2 class="h4 fw-bold text-warning mb-3"><i class="bi bi-cash-coin"></i> Платные мероприятия</h2>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-3">
+            {% for event in paid_events|slice:"0:5" %}
+                <div class="col">
+                    {% include 'events/_event_card.html' %}
+                </div>
+            {% empty %}
+                <div class="col-12"><div class="alert alert-info">Нет платных мероприятий.</div></div>
+            {% endfor %}
+        </div>
+        <div class="text-end mt-2">
+            <a href="?paid=1" class="btn btn-outline-primary btn-sm">Показать все</a>
+        </div>
     </div>
-    {% endif %}
+
+    <!-- Блок: Бесплатные мероприятия -->
+    <div class="mb-5">
+        <h2 class="h4 fw-bold text-info mb-3"><i class="bi bi-gift"></i> Бесплатные мероприятия</h2>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-3">
+            {% for event in free_events|slice:"0:5" %}
+                <div class="col">
+                    {% include 'events/_event_card.html' %}
+                </div>
+            {% empty %}
+                <div class="col-12"><div class="alert alert-info">Нет бесплатных мероприятий.</div></div>
+            {% endfor %}
+        </div>
+        <div class="text-end mt-2">
+            <a href="?free=1" class="btn btn-outline-primary btn-sm">Показать все</a>
+        </div>
+    </div>
 </div>
-    <!-- Подключение Select2 и скрипт для инициализации -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('.select2').select2({
-                placeholder: "Выберите значения",
-                allowClear: true,
-                closeOnSelect: false, // Оставляет список открытым после выбора
-                templateResult: function(data) {
-                    // Добавляем чекбоксы в выпадающий список
-                    if (!data.id) {
-                        return data.text;
-                    }
-                    var $state = $(
-                        '<span><input type="checkbox" class="select2-checkbox" ' + (data.selected ? 'checked' : '') + ' /> ' + data.text + '</span>'
-                    );
-                    return $state;
-                },
-                templateSelection: function(data) {
-                    // Отображаем выбранные элементы
-                    return data.text || data.id;
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<!-- Подключение Select2 и скрипт для инициализации -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.select2').select2({
+            placeholder: "Выберите значения",
+            allowClear: true,
+            closeOnSelect: false, // Оставляет список открытым после выбора
+            templateResult: function(data) {
+                // Добавляем чекбоксы в выпадающий список
+                if (!data.id) {
+                    return data.text;
                 }
-            });
-
-            // Синхронизация чекбоксов с выбором
-            $('.select2').on('select2:selecting', function(e) {
-                var $option = $(e.params.args.data.element);
-                $option.prop('selected', !$option.prop('selected'));
-            });
+                var $state = $(
+                    '<span><input type="checkbox" class="select2-checkbox" ' + (data.selected ? 'checked' : '') + ' /> ' + data.text + '</span>'
+                );
+                return $state;
+            },
+            templateSelection: function(data) {
+                // Отображаем выбранные элементы
+                return data.text || data.id;
+            }
         });
-    </script>
 
-    <!-- Подключение Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    {% endblock %}
+        // Синхронизация чекбоксов с выбором
+        $('.select2').on('select2:selecting', function(e) {
+            var $option = $(e.params.args.data.element);
+            $option.prop('selected', !$option.prop('selected'));
+        });
+    });
+</script>
+<!-- Подключение Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% endblock %}

@@ -2,16 +2,17 @@ from django import forms
 from .models import City, Genre
 
 class EventFilterForm(forms.Form):
-    cities = forms.ModelMultipleChoiceField(
+    cities = forms.ModelChoiceField(
         queryset=City.objects.all(),
         required=False,
-        widget=forms.SelectMultiple(attrs={'class': 'select2 form-control'})
+        empty_label='Все города',
+        widget=forms.Select(attrs={'class': 'select2 form-control', 'style': 'width: 100%;'})
     )
-    genres = forms.ModelMultipleChoiceField(
+    genres = forms.ModelChoiceField(
         queryset=Genre.objects.all(),
         required=False,
-        widget=forms.SelectMultiple(attrs={'class': 'select2 form-control'})#,
-        #empty_label='Все жанры'
+        empty_label='Все жанры',
+        widget=forms.Select(attrs={'class': 'select2 form-control', 'style': 'width: 100%;'})
     )
     date_from = forms.DateField(
         required=False,
@@ -24,10 +25,4 @@ class EventFilterForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Добавляем пустую опцию в список выбора для городов и жанров
-        self.fields['cities'].choices = [('', 'Все города')] + [
-            (obj.pk, str(obj)) for obj in self.fields['cities'].queryset
-        ]
-        self.fields['genres'].choices = [('', 'Все жанры')] + [
-            (obj.pk, str(obj)) for obj in self.fields['genres'].queryset
-        ]
+        # Не добавляю пустую опцию вручную, select2 сам позволяет сбросить выбор

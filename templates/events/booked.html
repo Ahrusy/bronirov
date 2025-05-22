@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+    <h1 class="display-5 text-center mb-4">Мои билеты</h1>
+    {% if not user.is_authenticated %}
+        <div class="alert alert-warning text-center">Войдите, чтобы увидеть свои билеты.</div>
+    {% else %}
+        {% if bookings %}
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                {% for booking in bookings %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0">
+                        {% if booking.event.image %}
+                            <img src="{{ booking.event.image.url }}" class="card-img-top" style="object-fit:cover; max-height:180px;" alt="{{ booking.event.title }}">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title"><a href="{% url 'events:event_detail' booking.event.pk %}" class="text-decoration-none">{{ booking.event.title }}</a></h5>
+                            <div class="mb-2 small text-muted">{{ booking.event.event_date|date:"d.m.Y" }}{% if booking.event.start_time %} {{ booking.event.start_time|time:"H:i" }}{% endif %}</div>
+                            <div class="mb-2">Город: {{ booking.event.city }}</div>
+                            <div class="mb-2">Место: {{ booking.event.location }}</div>
+                            <div class="mb-2">Статус: <span class="badge bg-{% if booking.status == 'BOOKED' %}primary{% elif booking.status == 'CONFIRMED' %}success{% else %}secondary{% endif %}">{{ booking.get_status_display }}</span></div>
+                        </div>
+                        <div class="card-footer bg-transparent border-top-0 text-center">
+                            <a href="{% url 'events:event_detail' booking.event.pk %}" class="btn btn-outline-primary btn-sm">Подробнее о событии</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info text-center">У вас пока нет забронированных мероприятий.</div>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %} 

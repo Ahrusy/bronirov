@@ -7,6 +7,8 @@ from django.core.files.base import ContentFile
 from django.db import transaction
 from events.models import City, Location, Genre, Event
 import pytz
+from collections import defaultdict
+import calendar
 
 # Определяем разумный диапазон дат
 MIN_TIMESTAMP = 0  # 1970-01-01 (начало эпохи UNIX)
@@ -83,97 +85,160 @@ class Command(BaseCommand):
             if not results:
                 break  # Нет больше событий
 
-            with transaction.atomic():
-                for event_data in results:
+            for event_data in results:
+                try:
+                    # Получение города
+                    city_name = event_data.get('location', {}).get('slug', 'Unknown')
+                    city, _ = City.objects.get_or_create(slug=city_name)
+
+                    # Получение места проведения
+                    place_data = event_data.get('place') or {}
+                    place_name = place_data.get('title', 'Unknown Place')
+                    place_address = place_data.get('address', '')
+                    postal_code = place_data.get('postal_code', '')
+                    location, _ = Location.objects.get_or_create(
+                        name=place_name,
+                        city=city,
+                        defaults={
+                            'address': place_address,
+                            'postal_code': postal_code,
+                        }
+                    )
+
+                    # Получение жанра (берём первый slug, ищем название)
+                    category_slug = (event_data.get('categories') or ['other'])[0]
+                    category_name = genre_map.get(category_slug, category_slug)
+                    genre, _ = Genre.objects.get_or_create(name=category_name)
+
+                    # Обработка даты и времени
+                    dates = (event_data.get('dates') or [{}])
+                    # Найти ближайшую будущую дату
+                    event_date = None
+                    start_time = None
+                    now_ts = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
+                    min_future_ts = None
+                    for d in dates:
+                        start_ts = d.get('start', 0)
+                        if start_ts > now_ts:
+                            if min_future_ts is None or start_ts < min_future_ts:
+                                min_future_ts = start_ts
+                    if min_future_ts:
+                        start_date = datetime.datetime.fromtimestamp(min_future_ts, tz=datetime.timezone.utc)
+                        event_date = start_date.date()
+                        start_time = start_date.time()
+                    else:
+                        # Если нет будущих дат, пробуем взять первую валидную дату
+                        for d in dates:
+                            start_ts = d.get('start', 0)
+                            if start_ts > 0:
+                                start_date = datetime.datetime.fromtimestamp(start_ts, tz=datetime.timezone.utc)
+                                event_date = start_date.date()
+                                start_time = start_date.time()
+                                break
+                    if not event_date:
+                        continue  # пропускать события без даты
+
+                    # Обработка цены
+                    price = event_data.get('price', '')
                     try:
-                        # Получение города
-                        city_name = event_data.get('location', {}).get('slug', 'Unknown')
-                        city, _ = City.objects.get_or_create(slug=city_name)
+                        ticket_price = float(price.split()[0].replace(',', '.')) if price and price[0].isdigit() else 0.00
+                    except (ValueError, IndexError):
+                        ticket_price = 0.00
+                    price_text = price if price else None
 
-                        # Получение места проведения
-                        place_data = event_data.get('place') or {}
-                        place_name = place_data.get('title', 'Unknown Place')
-                        place_address = place_data.get('address', '')
-                        postal_code = place_data.get('postal_code', '')
-                        location, _ = Location.objects.get_or_create(
-                            name=place_name,
-                            city=city,
-                            defaults={
-                                'address': place_address,
-                                'postal_code': postal_code,
-                            }
-                        )
+                    # Получение external_id
+                    external_id = str(event_data.get('id'))
 
-                        # Получение жанра (берём первый slug, ищем название)
-                        category_slug = (event_data.get('categories') or ['other'])[0]
-                        category_name = genre_map.get(category_slug, category_slug)
-                        genre, _ = Genre.objects.get_or_create(name=category_name)
-
-                        # Обработка даты и времени
-                        dates = (event_data.get('dates') or [{}])
-                        start_ts = dates[0].get('start', 0)
-                        if start_ts>0:
-                            start_date = datetime.datetime.fromtimestamp(start_ts, tz=datetime.timezone.utc)
-                            event_date = start_date.date()
-                            start_time = start_date.time()
+                    # Получение текстового расписания (schedule_text)
+                    # Исправлено: сохраняем только ближайший актуальный диапазон дат и времени
+                    schedule_text = event_data.get('when')
+                    if not schedule_text:
+                        # Если нет 'when', ищем ближайшую будущую дату/диапазон
+                        future_dates = [d for d in dates if d.get('start', 0) > now_ts]
+                        if future_dates:
+                            # Берём ближайший диапазон
+                            d = min(future_dates, key=lambda x: x.get('start', 0))
+                            start_dt = datetime.datetime.fromtimestamp(d['start'], tz=datetime.timezone.utc)
+                            end_dt = datetime.datetime.fromtimestamp(d['end'], tz=datetime.timezone.utc) if d.get('end') else None
+                            if end_dt and start_dt.date() != end_dt.date():
+                                # Диапазон дат
+                                schedule_text = f"{start_dt.strftime('%d.%m.%Y')} – {end_dt.strftime('%d.%m.%Y')} {start_dt.strftime('%H:%M')}–{end_dt.strftime('%H:%M')}"
+                            else:
+                                # Одна дата
+                                schedule_text = f"{start_dt.strftime('%d.%m.%Y')} {start_dt.strftime('%H:%M')}–{end_dt.strftime('%H:%M') if end_dt else ''}"
                         else:
-                            event_date = None
-                            start_time = None
+                            # Если нет будущих дат, fallback: первая валидная дата
+                            for d in dates:
+                                if d.get('start', 0) > 0:
+                                    start_dt = datetime.datetime.fromtimestamp(d['start'], tz=datetime.timezone.utc)
+                                    end_dt = datetime.datetime.fromtimestamp(d['end'], tz=datetime.timezone.utc) if d.get('end') else None
+                                    if end_dt and start_dt.date() != end_dt.date():
+                                        schedule_text = f"{start_dt.strftime('%d.%m.%Y')} – {end_dt.strftime('%d.%m.%Y')} {start_dt.strftime('%H:%M')}–{end_dt.strftime('%H:%M')}"
+                                    else:
+                                        schedule_text = f"{start_dt.strftime('%d.%m.%Y')} {start_dt.strftime('%H:%M')}–{end_dt.strftime('%H:%M') if end_dt else ''}"
+                                    break
 
-                        # Обработка цены
-                        price = event_data.get('price', '0.00')
-                        try:
-                            ticket_price = float(price.split()[0].replace(',', '.')) if price and price[0].isdigit() else 0.00
-                        except (ValueError, IndexError):
-                            ticket_price = 0.00
+                    # Формирование заголовка с возрастным ограничением
+                    title = event_data.get('title', 'Untitled')
+                    age = event_data.get('age_restriction')
+                    if age:
+                        title = f"{title} {age}+"
+                    # Название с заглавной буквы
+                    if title:
+                        title = title[:1].upper() + title[1:]
 
-                        # Получение external_id
-                        external_id = str(event_data.get('id'))
+                    # Описание без дублирующегося титула
+                    description = event_data.get('description', '')
+                    if description and title and description.lower().startswith(title.lower()):
+                        description = description[len(title):].lstrip(' .,-–—')
 
-                        event, created = Event.objects.get_or_create(
-                            external_id=external_id,
-                            defaults={
-                                'title': event_data.get('title', 'Untitled'),
-                                'description': event_data.get('description', ''),
-                                'event_date': event_date,
-                                'start_time': start_time,
-                                'city': city,
-                                'location': location,
-                                'genre': genre,
-                                'ticket_price': ticket_price,
-                                'available_tickets': 100,
-                                'rules': event_data.get('body_text', ''),
-                                'image': None,
-                                'event_url': event_data.get('site_url', ''),
-                                'source': 'KudaGo',
-                                'is_imported': True
-                            }
-                        )
+                    event, created = Event.objects.get_or_create(
+                        external_id=external_id,
+                        defaults={
+                            'title': title,
+                            'description': description,
+                            'event_date': event_date,
+                            'start_time': start_time,
+                            'city': city,
+                            'location': location,
+                            'genre': genre,
+                            'ticket_price': ticket_price,
+                            'price_text': price_text,
+                            'available_tickets': 100,
+                            'rules': event_data.get('body_text', ''),
+                            'image': None,
+                            'event_url': event_data.get('site_url', ''),
+                            'source': 'KudaGo',
+                            'is_imported': True,
+                            'schedule_text': schedule_text,
+                        }
+                    )
 
-                        # Загрузка изображения (если есть)
-                        images = event_data.get('images', [])
-                        if images and not event.image:
-                            image_url = images[0].get('image', '')
-                            if image_url:
-                                try:
-                                    image_response = requests.get(image_url)
-                                    if image_response.status_code == 200:
-                                        event.image.save(
-                                            f"event_{event.id}.jpg",
-                                            ContentFile(image_response.content),
-                                            save=True
-                                        )
-                                except requests.RequestException:
-                                    self.stdout.write(self.style.WARNING(f'Failed to download image for event {event.title}'))
+                    # Обновление изображения (если есть в KudaGo)
+                    images = event_data.get('images', [])
+                    if images:
+                        image_url = images[0].get('image', '')
+                        if image_url:
+                            try:
+                                image_response = requests.get(image_url)
+                                if image_response.status_code == 200:
+                                    event.image.save(
+                                        f"event_{event.id}.jpg",
+                                        ContentFile(image_response.content),
+                                        save=True
+                                    )
+                            except requests.RequestException:
+                                self.stdout.write(self.style.WARNING(f'Failed to download image for event {event.title}'))
 
-                        if created:
-                            self.stdout.write(self.style.SUCCESS(f'Created event: {event.title}'))
-                        else:
-                            self.stdout.write(f'Event already exists: {event.title}')
-                    except City.DoesNotExist:
-                        self.stdout.write(f"Город с slug '{city_slug}' не найден. Пропускаем событие: {event_data.get('title', 'Unknown')}")
-                    except Exception as e:
-                        self.stdout.write(self.style.ERROR(f'Error processing event {event_data.get("title")}: {str(e)}'))
+                    if created:
+                        self.stdout.write(self.style.SUCCESS(f'Created event: {event.title}'))
+                    else:
+                        self.stdout.write(f'Event already exists: {event.title}')
+                    time.sleep(0.1)  # Пауза между событиями
+                except City.DoesNotExist:
+                    self.stdout.write(f"Город с slug '{city_name}' не найден. Пропускаем событие: {event_data.get('title', 'Unknown')}")
+                except Exception as e:
+                    self.stdout.write(self.style.ERROR(f'Error processing event {event_data.get("title")}: {str(e)}'))
 
             page += 1
             time.sleep(1)  # Пауза для избежания лимитов API

@@ -56,6 +56,10 @@ class Event(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    schedule_text = models.CharField(max_length=300, blank=True, null=True)
+
+    price_text = models.CharField(max_length=100, blank=True, null=True)
+
     class Meta:
         ordering = ['event_date', 'start_time']
 

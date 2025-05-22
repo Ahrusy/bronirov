@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">Бронирование: {{ event.title }}</h2>
+    {% if error_message %}
+        <div class="alert alert-danger">{{ error_message }}</div>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Забронировать</button>
+        <a href="{% url 'events:event_detail' event.id %}" class="btn btn-secondary">Отмена</a>
+    </form>
+</div>
+{% endblock %} 
