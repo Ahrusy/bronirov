@@ -17,16 +17,18 @@
     <header>
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container">
-                <a class="navbar-brand" href="{% url 'events:event_list' %}">{{ site_name }}</a>
+                <a class="navbar-brand" href="{% url 'events:event_list' %}">{{ app_name }}</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto">
                         {% for item in menu_items %}
+                        {% if item.login_required is None or item.login_required and is_authenticated or item.login_required is False and not is_authenticated %}
                         <li class="nav-item">
                             <a class="nav-link {% if item.active %}fw-bold{% endif %}" href="{{ item.url }}">{{ item.title }}</a>
                         </li>
+                        {% endif %}
                         {% endfor %}
                     </ul>
                 </div>
@@ -52,7 +54,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
-                    <h5>{{ site_name }}</h5>
+                    <h5>{{ app_name }}</h5>
                     <p>{{ footer.description }}</p>
                 </div>
                 <div class="col-md-3">
@@ -73,7 +75,7 @@
                 </div>
             </div>
             <div class="text-center mt-4">
-                <p class="mb-0">&copy; {{ current_year }} {{ site_name }}. Все права защищены.</p>
+                <p class="mb-0">&copy; {{ current_year }} {{ app_name }}. Все права защищены.</p>
             </div>
         </div>
     </footer>
@@ -81,5 +83,6 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     {% block extra_js %}{% endblock %}
+<p>{{ context }}</p>
 </body>
 </html>

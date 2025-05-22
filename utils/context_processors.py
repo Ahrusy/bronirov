@@ -8,19 +8,19 @@ import datetime
 
 # Shared site data
 SITE_INFO = {
-    'site_name': 'Бронирования мероприятий',
+    'app_name': 'Бронирования мероприятий',
     'current_year': datetime.datetime.now().year,
 }
 
 # Base menu structure
 DEFAULT_MENU = [
-    {'title': 'События', 'url': '/', 'active': False},
-    {'title': 'Профмль', 'url': '/profile/', 'active': False},
-    {'title': 'Забронировано', 'url': '/booked/', 'active': False},
-    {'title': 'Выход', 'url': '/logout/', 'active': False},
-    {'title': 'Регистрация', 'url': '/register/', 'active': False},
-    {'title': 'Вход', 'url': '/login/', 'active': False},
-    {'title': 'Контакты', 'url': '/contacts/', 'active': False},
+    {'title': 'События', 'url': '/', 'active': False, 'login_required': None},
+    {'title': 'Профиль', 'url': '/accounts/profile/', 'active': False, 'login_required': True},
+    {'title': 'Забронировано', 'url': '/booked/', 'active': False, 'login_required': True},
+    {'title': 'Выход', 'url': '/accounts/logout/', 'active': False, 'login_required': True},
+    {'title': 'Регистрация', 'url': '/accounts/register/', 'active': False, 'login_required': False},
+    {'title': 'Вход', 'url': '/accounts/login/', 'active': False, 'login_required': False},
+    {'title': 'Контакты', 'url': '/contacts/', 'active': False, 'login_required': None},
 ]
 
 # Footer data
@@ -59,7 +59,7 @@ def get_base_context(request):
             else:
                 item['active'] = False
         else:
-            if request.path.endswith('/add/'):
+            if request.path.endswith('/edit/'):
                 item['active'] = request.path == item['url']
             else:
                 item['active'] = ( request.path.startswith(item['url']))
@@ -70,6 +70,7 @@ def get_base_context(request):
         **SITE_INFO,
         'menu_items': menu_items,
         'footer': FOOTER_INFO,
+        'is_authenticated': request.user.is_authenticated,
     }
 
     return context

@@ -14,7 +14,7 @@ def register_user(request):
             user = form.save()
             login(request, user)  # автоматически залогинить
             messages.success(request, "Вы успешно зарегистрированы!")
-            return redirect('event_list')
+            return redirect('events:event_list')
     else:
         form = UserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
@@ -37,4 +37,7 @@ def edit_profile(request):
             return redirect('profile')
     else:
         form = ProfileForm(instance=profile)
-    return render(request, 'registration/edit_profile.html', {'form': form})
+        context = {
+            'form': form
+        }
+    return render(request, 'registration/edit_profile.html', context=context)
