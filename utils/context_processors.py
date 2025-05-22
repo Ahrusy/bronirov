@@ -5,23 +5,13 @@ to maintain consistency in templates and views.
 """
 
 import datetime
+import logging
 
 # Shared site data
 SITE_INFO = {
     'site_name': 'Бронирования мероприятий',
     'current_year': datetime.datetime.now().year,
 }
-
-# Base menu structure
-DEFAULT_MENU = [
-    {'title': 'События', 'url': '/', 'active': False},
-    {'title': 'Профмль', 'url': '/profile/', 'active': False},
-    {'title': 'Забронировано', 'url': '/booked/', 'active': False},
-    {'title': 'Выход', 'url': '/logout/', 'active': False},
-    {'title': 'Регистрация', 'url': '/register/', 'active': False},
-    {'title': 'Вход', 'url': '/login/', 'active': False},
-    {'title': 'Контакты', 'url': '/contacts/', 'active': False},
-]
 
 # Footer data
 FOOTER_INFO = {
@@ -48,22 +38,29 @@ def get_base_context(request):
     Returns:
         dict: Context dictionary with common data
     """
-    # Copy menu items to avoid modifying the original
-    menu_items = DEFAULT_MENU.copy()
+    # Build menu based on authentication
+    menu_items = [
+        {'title': 'Мероприятия', 'url': '/', 'active': False}
+    ]
+    
+    # Check if the user attribute exists and is authenticated
+    user_is_authenticated = request.user.is_authenticated if hasattr(request, 'user') else False
+    
+    # Add profile link only for authenticated users
+    if user_is_authenticated:
+        menu_items.append({'title': 'Профиль', 'url': '/profile/', 'active': False})
+    else:
+        # Add login and registration links for non-authenticated users
+        menu_items.append({'title': 'Вход', 'url': '/users/login/', 'active': False})
+        menu_items.append({'title': 'Регистрация', 'url': '/users/register/', 'active': False})
 
     # Set active menu item
     for item in menu_items:
         if item['url'] == '/':
             if request.path == '/':
                 item['active'] = True
-            else:
-                item['active'] = False
         else:
-            if request.path.endswith('/add/'):
-                item['active'] = request.path == item['url']
-            else:
-                item['active'] = ( request.path.startswith(item['url']))
-
+            item['active'] = request.path.startswith(item['url'])
 
     # Create base context
     context = {

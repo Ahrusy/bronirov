@@ -1,0 +1,425 @@
+:root {
+    /* Material Design 3 цветовая схема */
+    --md-primary: #6750A4;
+    --md-primary-container: #EADDFF;
+    --md-on-primary: #FFFFFF;
+    --md-on-primary-container: #21005E;
+    --md-secondary: #625B71;
+    --md-secondary-container: #E8DEF8;
+    --md-on-secondary: #FFFFFF;
+    --md-on-secondary-container: #1E192B;
+    --md-surface: #FFFBFE;
+    --md-surface-container: #F3EDF7;
+    --md-on-surface: #1C1B1F;
+    --md-outline: #79747E;
+    --md-error: #B3261E;
+    --md-on-error: #FFFFFF;
+}
+
+/* Общие стили */
+body {
+    font-family: 'Roboto', system-ui, -apple-system, sans-serif;
+    color: var(--md-on-surface);
+    line-height: 1.6;
+    background-color: var(--md-surface);
+}
+
+a {
+    text-decoration: none;
+    color: var(--md-primary);
+}
+
+a:hover {
+    text-decoration: none;
+    color: var(--md-primary-container);
+}
+
+/* Стили для навигации */
+.navbar {
+    padding: 1rem 0;
+    background-color: var(--md-surface) !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.navbar-brand {
+    font-weight: 500;
+    font-size: 1.25rem;
+    color: var(--md-primary) !important;
+}
+
+.nav-link {
+    font-weight: 500;
+    padding: 0.5rem 1rem !important;
+    color: var(--md-on-surface) !important;
+    transition: color 0.2s ease-in-out;
+}
+
+.nav-link:hover {
+    color: var(--md-primary) !important;
+}
+
+.nav-link.active {
+    color: var(--md-primary) !important;
+}
+
+/* Стили для форм */
+.form-control,
+.select2-container--bootstrap-5 .select2-selection,
+.btn {
+    height: 48px;
+    min-height: 48px;
+    font-size: 1rem;
+    vertical-align: middle;
+    padding-top: 0;
+    padding-bottom: 0;
+    line-height: 1.5;
+}
+
+.form-control {
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 1.25rem;
+    border: 1px solid var(--md-outline);
+    background-color: var(--md-surface);
+    transition: all 0.2s ease-in-out;
+}
+
+.form-control:focus {
+    border-color: var(--md-primary);
+    box-shadow: 0 0 0 2px var(--md-primary-container);
+}
+
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--md-on-surface);
+}
+
+/* Стили для карточек */
+.card {
+    border: none;
+    border-radius: 1.5rem;
+    background-color: var(--md-surface);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.card-header {
+    background-color: var(--md-surface);
+    border-bottom: 1px solid var(--md-outline);
+    padding: 1.25rem;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Выравнивание изображений в карточках */
+.card-img-top {
+    width: 100%;
+    height: 200px; /* Фиксированная высота */
+    object-fit: cover; /* Сохраняет пропорции и заполняет контейнер */
+}
+
+/* Стили для кнопок */
+.btn {
+    height: 38px !important;
+    min-height: 38px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    border-radius: 1.25rem !important;
+}
+
+.btn-primary {
+    background-color: var(--md-primary);
+    border-color: var(--md-primary);
+    color: var(--md-on-primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--md-primary-container);
+    border-color: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+    transform: translateY(-1px);
+}
+
+.btn-outline-primary {
+    color: var(--md-primary);
+    border-color: var(--md-primary);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--md-primary);
+    color: var(--md-on-primary);
+    border-color: var(--md-primary);
+}
+
+/* Стили для футера */
+footer {
+    background-color: var(--md-surface-container);
+    color: var(--md-on-surface);
+}
+
+footer h5 {
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+    color: var(--md-on-surface);
+}
+
+footer a {
+    color: var(--md-primary);
+    transition: color 0.2s ease-in-out;
+}
+
+footer a:hover {
+    color: var(--md-primary-container);
+    text-decoration: none;
+}
+
+/* Стили для уведомлений */
+.alert {
+    border: none;
+    border-radius: 1rem;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.alert-success {
+    background-color: #E6F4EA;
+    color: #1E4620;
+}
+
+.alert-danger {
+    background-color: #FCE8E6;
+    color: #C5221F;
+}
+
+.alert-warning {
+    background-color: #FEF7E0;
+    color: #B06000;
+}
+
+.alert-info {
+    background-color: #E8F0FE;
+    color: #1A73E8;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Material Design 3 специфичные стили */
+.elevation-1 {
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.elevation-2 {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.elevation-3 {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Стили для иконок */
+.bi {
+    vertical-align: -0.125em;
+}
+
+/* Стили для текста */
+.text-primary {
+    color: var(--md-primary) !important;
+}
+
+.text-secondary {
+    color: var(--md-secondary) !important;
+}
+
+/* Стили для контейнеров */
+.container {
+    padding: 1rem;
+}
+
+@media (min-width: 768px) {
+    .container {
+        padding: 2rem;
+    }
+}
+
+/* Исправление моргания ссылок в карточках */
+.card a {
+    position: relative;
+    z-index: 2;
+    transition: color 0.2s ease-in-out;
+}
+
+.card a:hover {
+    text-decoration: none;
+    color: var(--md-primary);
+}
+
+/* Для stretched-link, перекрывающих всю карточку */
+.card .stretched-link::after {
+    z-index: 1;
+}
+
+.input-group-text .material-icons {
+    font-size: 1.2rem;
+    line-height: 1;
+    vertical-align: middle;
+    margin-top: 0;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+/* Выравнивание select2 с инпутами и кнопкой фильтра */
+.select2-container--bootstrap-5 .select2-selection--multiple,
+.select2-container--bootstrap-5 .select2-selection--single {
+    min-height: 38px !important;
+    height: 38px !important;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+}
+
+/* Универсальное выравнивание текста по центру для фильтра */
+.form-control,
+.select2-container--bootstrap-5 .select2-selection--multiple,
+.select2-container--bootstrap-5 .select2-selection--single {
+    display: flex !important;
+    align-items: center !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    line-height: 1.2 !important;
+    font-size: 0.95rem;
+}
+
+.form-control-sm,
+.select2-container--bootstrap-5 .select2-selection--multiple,
+.select2-container--bootstrap-5 .select2-selection--single {
+    height: 32px !important;
+    min-height: 32px !important;
+    font-size: 0.95rem;
+}
+
+/* Радикальное выравнивание всех элементов фильтра */
+.form-control[type="date"],
+.form-control-sm[type="date"] {
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 0 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    line-height: 1 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* Выравнивание для select2 */
+.select2-container {
+    height: 38px !important;
+}
+
+.select2-container .select2-selection {
+    height: 38px !important;
+    min-height: 38px !important;
+    display: flex !important;
+    align-items: center !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.select2-container .select2-selection__rendered {
+    display: flex !important;
+    align-items: center !important;
+    height: 100% !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* Дополнительная настройка для кнопки фильтра - выравнивание по нижнему краю */
+.btn.btn-primary.btn-sm.w-100.my-auto {
+    margin-top: auto !important; /* Вместо фиксированного смещения используем auto для прижатия к низу */
+}
+
+/* Принудительное выравнивание всех элементов фильтра */
+.col-md-6.col-lg-2 .form-control,
+.col-md-6.col-lg-3 .form-control,
+.col-md-12.col-lg-2 .btn {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    height: 38px !important;
+}
+
+/* Выравнивание всей строки формы */
+.form-label {
+    margin-bottom: 8px !important;
+    display: block !important;
+}
+
+/* Для разных поддержек браузеров */
+input::-webkit-datetime-edit {
+    display: flex !important;
+    align-items: center !important;
+    height: 100% !important;
+}
+
+/* Для placeholder в select2 */
+.select2-search__field {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    height: 100% !important;
+}
+
+/* Дополнительная настройка для кнопки фильтра */
+.btn.btn-primary.btn-sm.w-100.my-auto {
+    margin-top: 8px !important;
+}
+
+/* Корректировка для кнопок внутри карточек */
+.card-footer .btn, 
+.card .btn {
+    font-size: 0.875rem !important;
+}
+
+/* Переопределяем высоту и выравнивание для всех типовых кнопок действий */
+.btn-primary, .btn-outline-primary, .btn-secondary, .btn-outline-secondary {
+    height: 38px !important;
+    padding-left: 1.25rem !important;
+    padding-right: 1.25rem !important;
+}
+
+/* Контейнер кнопки фильтровать - выравнивание содержимого по нижнему краю */
+.col-md-12.col-lg-2.d-flex.flex-column {
+    justify-content: flex-end !important; /* Прижимаем содержимое к нижнему краю */
+} 

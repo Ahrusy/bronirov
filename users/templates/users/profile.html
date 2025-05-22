@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- Боковое меню -->
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Личный кабинет</h5>
+                    <div class="list-group">
+                        <a href="#bookings" class="list-group-item list-group-item-action active">
+                            Мои бронирования
+                        </a>
+                        <a href="{% url 'users:edit_profile' %}" class="list-group-item list-group-item-action">
+                            Редактировать профиль
+                        </a>
+                        <a href="{% url 'events:favorite_events' %}" class="list-group-item list-group-item-action">
+                            Избранные мероприятия
+                        </a>
+                        <form action="{% url 'users:logout' %}" method="post" class="m-0">
+                            {% csrf_token %}
+                            <button type="submit" class="list-group-item list-group-item-action text-danger w-100 text-start border-0">
+                                <i class="material-icons me-1 small">logout</i> Выйти
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Основной контент -->
+        <div class="col-md-9">
+            <!-- Активные бронирования -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Активные бронирования</h5>
+                </div>
+                <div class="card-body">
+                    {% if active_bookings %}
+                        {% for booking in active_bookings %}
+                            <div class="booking-item mb-3 p-3 border rounded">
+                                <h6>{{ booking.event.title }}</h6>
+                                <p class="mb-1">Дата: {{ booking.event.event_date }}</p>
+                                <p class="mb-1">Время: {{ booking.event.start_time }}</p>
+                                <p class="mb-1">Место: {{ booking.event.location.name }}</p>
+                                <a href="{% url 'users:booking_detail' booking.id %}" class="btn btn-sm btn-outline-primary">
+                                    Подробнее
+                                </a>
+                                <a href="{% url 'users:cancel_booking' booking.id %}" class="btn btn-sm btn-outline-danger">Отменить</a>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">У вас нет активных бронирований</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Ожидающие бронирования -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Ожидающие подтверждения</h5>
+                </div>
+                <div class="card-body">
+                    {% if pending_bookings %}
+                        {% for booking in pending_bookings %}
+                            <div class="booking-item mb-3 p-3 border rounded">
+                                <h6>{{ booking.event.title }}</h6>
+                                <p class="mb-1">Дата: {{ booking.event.event_date }}</p>
+                                <p class="mb-1">Время: {{ booking.event.start_time }}</p>
+                                <p class="mb-1">Место: {{ booking.event.location.name }}</p>
+                                <a href="{% url 'users:booking_detail' booking.id %}" class="btn btn-sm btn-outline-primary">
+                                    Подробнее
+                                </a>
+                                <a href="{% url 'users:cancel_booking' booking.id %}" class="btn btn-sm btn-outline-danger">Отменить</a>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">У вас нет ожидающих бронирований</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- История бронирований -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">История бронирований</h5>
+                </div>
+                <div class="card-body">
+                    {% if history_bookings %}
+                        {% for booking in history_bookings %}
+                            <div class="booking-item mb-3 p-3 border rounded">
+                                <h6>{{ booking.event.title }}</h6>
+                                <p class="mb-1">Дата: {{ booking.event.event_date }}</p>
+                                <p class="mb-1">Время: {{ booking.event.start_time }}</p>
+                                <p class="mb-1">Место: {{ booking.event.location.name }}</p>
+                                <p class="mb-1">Статус: {{ booking.status }}</p>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">У вас нет истории бронирований</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Уведомления -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Уведомления</h5>
+                </div>
+                <div class="card-body">
+                    {% if notifications %}
+                        {% for notification in notifications %}
+                            <div class="notification-item mb-3 p-3 border rounded">
+                                <p class="mb-1">{{ notification.message }}</p>
+                                <small class="text-muted">{{ notification.created_at }}</small>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">У вас нет уведомлений</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

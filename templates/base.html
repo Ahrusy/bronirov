@@ -7,17 +7,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Бронирование мероприятий{% endblock %}</title>
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Roboto Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet"/>
     {% block extra_css %}<link rel="stylesheet" href="{% static 'styles.css' %}">{% endblock %}
 </head>
 <body class="d-flex flex-column min-vh-100">
     <!-- Header -->
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <nav class="navbar navbar-expand-lg navbar-light elevation-1">
             <div class="container">
-                <a class="navbar-brand" href="{% url 'events:event_list' %}">{{ site_name }}</a>
+                <a class="navbar-brand d-flex align-items-center" href="{% url 'events:event_list' %}">
+                    <span class="material-icons me-2">event</span>
+                    <span>Бронирование мероприятий</span>
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -25,7 +34,18 @@
                     <ul class="navbar-nav ms-auto">
                         {% for item in menu_items %}
                         <li class="nav-item">
-                            <a class="nav-link {% if item.active %}fw-bold{% endif %}" href="{{ item.url }}">{{ item.title }}</a>
+                            <a class="nav-link d-flex align-items-center {% if item.active %}active{% endif %}" href="{{ item.url }}">
+                                {% if item.title == 'Мероприятия' %}
+                                    <span class="material-icons me-1">calendar_month</span>
+                                {% elif item.title == 'Профиль' %}
+                                    <span class="material-icons me-1">person</span>
+                                {% elif item.title == 'Вход' %}
+                                    <span class="material-icons me-1">login</span>
+                                {% elif item.title == 'Регистрация' %}
+                                    <span class="material-icons me-1">person_add</span>
+                                {% endif %}
+                                {{ item.title }}
+                            </a>
                         </li>
                         {% endfor %}
                     </ul>
@@ -34,52 +54,84 @@
         </nav>
     </header>
 
-    <main>
+    <main class="flex-grow-1 py-4">
         {% if messages %}
-            <ul>
+            <div class="container">
                 {% for message in messages %}
-                    <li>{{ message }}</li>
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show elevation-1" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
                 {% endfor %}
-            </ul>
+            </div>
         {% endif %}
 
         {% block content %}
         {% endblock %}
     </main>
 
-     <!-- Footer -->
-    <footer class="py-4 mt-4 bg-light border-top">
+    <!-- Footer -->
+    <footer class="py-4 mt-4 elevation-1">
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
-                    <h5>{{ site_name }}</h5>
-                    <p>{{ footer.description }}</p>
+                    <h5 class="d-flex align-items-center">
+                        <span class="material-icons me-2">event</span>
+                        Бронирование мероприятий
+                    </h5>
+                    <p class="text-muted">{{ footer.description }}</p>
                 </div>
                 <div class="col-md-3">
-                    <h5>Ссылки</h5>
+                    <h5 class="mb-3">Ссылки</h5>
                     <ul class="list-unstyled">
                         {% for link in footer.links %}
-                        <li><a href="{{ link.url }}" class="text-decoration-none">{{ link.title }}</a></li>
+                        <li class="mb-2">
+                            <a href="{{ link.url }}" class="text-decoration-none d-flex align-items-center">
+                                <span class="material-icons me-1" style="font-size: 1rem;">chevron_right</span>
+                                {{ link.title }}
+                            </a>
+                        </li>
                         {% endfor %}
                     </ul>
                 </div>
                 <div class="col-md-3">
-                    <h5>Контакты</h5>
-                    <address>
-                        {{ footer.address }}<br>
-                        <abbr title="Телефон">Т:</abbr> {{ footer.phone }}<br>
-                        <a href="mailto:{{ footer.email }}" class="text-decoration-none">{{ footer.email }}</a>
+                    <h5 class="mb-3">Контакты</h5>
+                    <address class="text-muted">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="material-icons me-2">location_on</span>
+                            {{ footer.address }}
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="material-icons me-2">phone</span>
+                            {{ footer.phone }}
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span class="material-icons me-2">email</span>
+                            <a href="mailto:{{ footer.email }}" class="text-decoration-none">{{ footer.email }}</a>
+                        </div>
                     </address>
                 </div>
             </div>
-            <div class="text-center mt-4">
-                <p class="mb-0">&copy; {{ current_year }} {{ site_name }}. Все права защищены.</p>
+            <div class="text-center mt-4 pt-3 border-top">
+                <p class="mb-0 text-muted">&copy; {{ current_year }} Бронирование мероприятий. Все права защищены.</p>
             </div>
         </div>
     </footer>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    {% block extra_js %}{% endblock %}
+    {% block extra_js %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.select2').select2({
+                placeholder: "Выберите значения",
+                allowClear: true,
+                theme: 'bootstrap-5'
+            });
+        });
+    </script>
+    {% endblock %}
 </body>
 </html>

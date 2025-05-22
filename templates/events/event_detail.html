@@ -1,54 +1,207 @@
 <!-- templates/events/event_detail.html -->
 {% extends "base.html" %}
 {% load static %}
-{% block content %}
-<div class="container my-5">
-    <div class="row">
-        <div class="col-12">
-            <div class="d-flex align-items-start">
-                {% if event.image %}
-                <img src="{{ event.image.url }}" class="float-start me-3 img-fluid" alt="{{ event.title|escape }}"
-                     style="max-width: 300px; object-fit: cover;">
-                {% else %}
-                {% if event.genre and event.genre.id %}
-                <img src="{% static 'img/genre/' %}{{ event.genre.id }}.jpg" class="float-start me-3 img-fluid"
-                     alt="{{ event.title|escape }}" style="max-width: 300px; object-fit: cover;">
-                {% else %}
-                <img src="{% static 'img/genre/11.jpg' %}" class="float-start me-3 img-fluid"
-                     alt="{{ event.title|escape }}" style="max-width: 300px; object-fit: cover;">
-                {% endif %}
-                {% endif %}
-                <div>
-                    <h1 class="h2 mb-3">{{ event.title }}</h1>
-                    <p class="lead">{{ event.description|safe }}</p>
-                    <ul class="list-unstyled">
-                        <li><strong>Дата:</strong> {{ event.event_date|date:"d.m.Y" }}</li>
-                        <li><strong>Город:</strong> {{ event.location.city.name }}</li>
-                        <li><strong>Место:</strong> {{ event.location.name }}</li>
-                        <li><strong>Жанр:</strong> {{ event.genre }}</li>
-                        <li><strong>Цена:</strong> {{ event.ticket_price }} ₽</li>
-                        <li><strong>Билетов осталось:</strong> {{ event.available_tickets }}</li>
-                    </ul>
 
+{% block extra_head %}
+<style>
+    .favorite-btn {
+        transition: all 0.3s ease;
+    }
+    .favorite-btn:hover {
+        transform: scale(1.05);
+    }
+    .favorite-btn .material-icons {
+        transition: all 0.3s ease;
+    }
+    .favorite-btn:hover .material-icons {
+        transform: scale(1.2);
+    }
+    .favorite-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        z-index: 2;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        background-color: rgba(255, 193, 7, 0.9);
+        color: #000;
+        font-weight: bold;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Заголовок и основная информация -->
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h1 class="display-4">{{ event.title }}</h1>
+            {% if user.is_authenticated %}
+            <form action="{% url 'events:toggle_favorite' event.id %}" method="post" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn favorite-btn {% if is_favorite %}btn-warning{% else %}btn-outline-warning{% endif %} btn-lg">
+                    <span class="material-icons me-2" style="vertical-align: middle;">{% if is_favorite %}star{% else %}star_outline{% endif %}</span>
+                    {% if is_favorite %}
+                    В избранном
+                    {% else %}
+                    Добавить в избранное
+                    {% endif %}
+                </button>
+            </form>
+            {% endif %}
+        </div>
+        <div class="col-12">
+            {% if is_favorite %}
+            <div class="alert alert-warning mt-3" role="alert">
+                <span class="material-icons me-2" style="vertical-align: middle;">info</span>
+                Это мероприятие находится в вашем списке избранного. Вы можете найти его в разделе <a href="{% url 'events:favorite_events' %}" class="alert-link">Избранные мероприятия</a>.
+            </div>
+            {% endif %}
+            <p class="lead text-muted">{{ event.description|safe }}</p>
+            <hr class="my-4">
+        </div>
+    </div>
+    
+    <!-- Изображение и детали -->
+    <div class="row mb-5">
+        <div class="col-lg-5 col-md-6 mb-4 mb-md-0 position-relative">
+            {% if is_favorite %}
+            <div class="favorite-badge">
+                <span class="material-icons me-1" style="vertical-align: middle;">star</span>
+                В избранном
+            </div>
+            {% endif %}
+            {% if event.image %}
+            <img src="{{ event.image.url }}" class="img-fluid rounded-3 elevation-2" alt="{{ event.title|escape }}">
+            {% else %}
+            {% if event.genre and event.genre.id %}
+            <img src="{% static 'img/genre/' %}{{ event.genre.id }}.jpg" class="img-fluid rounded-3 elevation-2" alt="{{ event.title|escape }}">
+            {% else %}
+            <img src="{% static 'img/genre/11.jpg' %}" class="img-fluid rounded-3 elevation-2" alt="{{ event.title|escape }}">
+            {% endif %}
+            {% endif %}
+        </div>
+        <div class="col-lg-7 col-md-6">
+            <div class="card elevation-2 border-0 rounded-3">
+                <div class="card-body">
+                    <h2 class="card-title h4 mb-4">Информация о мероприятии</h2>
+                    <div class="row mb-3">
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <span class="material-icons me-2" style="color: var(--md-primary);">calendar_today</span>
+                                <div>
+                                    <div class="text-muted small">Дата</div>
+                                    <div class="fw-bold">{{ event.event_date|date:"d.m.Y" }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <span class="material-icons me-2" style="color: var(--md-primary);">location_on</span>
+                                <div>
+                                    <div class="text-muted small">Город</div>
+                                    <div class="fw-bold">{{ event.location.city.name }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <span class="material-icons me-2" style="color: var(--md-primary);">place</span>
+                                <div>
+                                    <div class="text-muted small">Место</div>
+                                    <div class="fw-bold">{{ event.location.name }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <span class="material-icons me-2" style="color: var(--md-primary);">category</span>
+                                <div>
+                                    <div class="text-muted small">Жанр</div>
+                                    <div class="fw-bold">{{ event.genre }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <span class="material-icons me-2" style="color: var(--md-primary);">payments</span>
+                                <div>
+                                    <div class="text-muted small">Цена</div>
+                                    <div class="fw-bold">{{ event.ticket_price }} ₽</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <span class="material-icons me-2" style="color: var(--md-primary);">confirmation_number</span>
+                                <div>
+                                    <div class="text-muted small">Билетов осталось</div>
+                                    <div class="fw-bold">{{ event.available_tickets }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% if event.rules %}
+                    <div class="mb-3">
+                        <h5 class="mb-2">Правила</h5>
+                        <p class="card-text">{{ event.rules|safe }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if event.event_url %}
+                    <a href="{{ event.event_url }}" target="_blank" class="btn btn-outline-primary mb-3">
+                        <span class="material-icons me-1" style="font-size: 1rem;">link</span>
+                        Страница мероприятия
+                    </a>
+                    {% endif %}
                 </div>
             </div>
-            {% if event.rules %}
-            <p><strong>Правила:</strong> {{ event.rules|safe }}</p>
-            {% endif %}
-            {% if event.event_url %}
-            <p><a href="{{ event.event_url }}" target="_blank">Страница мероприятия</a></p>
-            {% endif %}
-
-            <form action="{% url 'bookings:book_event' event.id %}" method="post">
-                {% csrf_token %}
-                <label>Имя: <input type="text" name="user_name" required></label><br>
-                <label>Email: <input type="email" name="user_email" required></label><br>
-                <label>Telegram: <input type="text" name="user_telegram"></label><br>
-                <button type="submit">Забронировать</button>
-            </form>
-
-
-            <a href="{% url 'events:event_list' %}" class="btn btn-outline-primary mt-3">Назад к списку</a>
+        </div>
+    </div>
+    
+    <!-- Форма бронирования -->
+    <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+            <div class="card elevation-2 border-0 rounded-3">
+                <div class="card-header bg-primary-subtle">
+                    <h3 class="h5 mb-0 text-primary">Бронирование билета</h3>
+                </div>
+                <div class="card-body">
+                    <form action="{% url 'booking:book_event' event.id %}" method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="user_name" class="form-label">Имя:</label>
+                            <input type="text" name="user_name" id="user_name" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="user_email" class="form-label">Email:</label>
+                            <input type="email" name="user_email" id="user_email" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="user_telegram" class="form-label">Telegram:</label>
+                            <input type="text" name="user_telegram" id="user_telegram" class="form-control" placeholder="@username (опционально)">
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <span class="material-icons me-1" style="font-size: 1rem;">confirmation_number</span>
+                                Забронировать
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="{% url 'events:event_list' %}" class="btn btn-outline-primary">
+                    <span class="material-icons me-1" style="font-size: 1rem;">arrow_back</span>
+                    Назад к списку
+                </a>
+            </div>
         </div>
     </div>
 </div>

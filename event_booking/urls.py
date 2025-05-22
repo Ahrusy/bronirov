@@ -8,6 +8,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('events.urls', namespace='events')),
     path('', include('booking.urls', namespace='booking')),
+    path('users/', include('users.urls', namespace='users')),
 ]
 
 if settings.DEBUG:

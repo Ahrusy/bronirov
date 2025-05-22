@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h2 class="card-title mb-4">Бронирование успешно создано!</h2>
+                    
+                    <div class="booking-details mb-4">
+                        <h4>{{ event.title }}</h4>
+                        <p>Дата: {{ event.event_date }}</p>
+                        <p>Время: {{ event.start_time }}</p>
+                        <p>Место: {{ event.location.name }}</p>
+                        <p>Стоимость: {{ event.ticket_price }} руб.</p>
+                    </div>
+
+                    {% if not booking.is_confirmed %}
+                        <form action="{% url 'booking:process_payment' booking.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                Оплатить {{ event.ticket_price }} руб.
+                            </button>
+                        </form>
+                    {% else %}
+                        <div class="alert alert-success">
+                            <h4>Оплата подтверждена!</h4>
+                            <p>Проверьте вашу почту для получения билета.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

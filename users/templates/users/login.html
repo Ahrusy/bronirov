@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card elevation-2 border-0 rounded-4">
+                <div class="card-header bg-white border-0 pb-0">
+                    <h2 class="mb-0 text-center">Вход</h2>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" autocomplete="off">
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <strong>Ошибка!</strong> Пожалуйста, проверьте имя пользователя и пароль.
+                        </div>
+                        {% endif %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mb-3 text-center">
+                            <label for="id_username" class="form-label fw-semibold">Имя пользователя</label>
+                            <input type="text" name="username" class="form-control mx-auto {% if form.username.errors %}is-invalid{% endif %}" id="id_username" style="max-width: 320px;">
+                            {% if form.username.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.username.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3 text-center">
+                            <label for="id_password" class="form-label fw-semibold">Пароль</label>
+                            <input type="password" name="password" class="form-control mx-auto {% if form.password.errors %}is-invalid{% endif %}" id="id_password" style="max-width: 320px;">
+                            {% if form.password.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.password.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-bold mt-3">
+                            Войти
+                        </button>
+                    </form>
+                    <div class="text-center mt-3">
+                        <a href="{% url 'users:register' %}" class="text-primary fw-semibold">Нет аккаунта? Зарегистрироваться</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
