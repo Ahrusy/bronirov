@@ -35,6 +35,11 @@
                             <div class="mb-2 small text-muted"><i class="bi bi-calendar-event"></i> {{ booking.event.event_date|date:"d.m.Y" }}{% if booking.event.start_time %} <i class="bi bi-clock"></i> {{ booking.event.start_time|time:"H:i" }}{% endif %}</div>
                             <div class="mb-2"><i class="bi bi-geo-alt"></i> {{ booking.event.city }}</div>
                             <div class="mb-2"><i class="bi bi-geo"></i> {{ booking.event.location }}</div>
+                            <div class="mb-2"><i class="bi bi-person"></i> ФИО: {{ booking.user_name }}</div>
+                            <div class="mb-2"><i class="bi bi-envelope"></i> Email: {{ booking.user_email }}</div>
+                            <div class="mb-2"><i class="bi bi-telegram"></i> Telegram: {{ booking.user_telegram }}</div>
+                            <div class="mb-2"><i class="bi bi-123"></i> Количество билетов: <span class="fw-bold">{{ booking.quantity }}</span></div>
+                            <div class="mb-2"><i class="bi bi-calendar-check"></i> Дата бронирования: {{ booking.booking_date|date:"d.m.Y H:i" }}</div>
                             <div class="mb-2">Статус: <span class="badge bg-{% if booking.status == 'BOOKED' %}primary{% elif booking.status == 'CONFIRMED' %}success{% else %}secondary{% endif %}">{{ booking.get_status_display }}</span></div>
                         </div>
                         <div class="card-footer bg-transparent border-top-0 text-center">

@@ -49,8 +49,13 @@
             {% endif %}
         </div>
     </div>
-    <div class="card-footer bg-transparent border-top-0 text-center p-2">
-        <a href="{% url 'events:event_detail' event.pk %}" class="btn btn-sm btn-outline-primary w-100 fw-semibold"><i class="bi bi-arrow-right-circle"></i> Подробнее</a>
+    <div class="card-footer bg-transparent border-top-0 text-center p-2 d-flex gap-2">
+        {% if user.is_authenticated %}
+            <a href="{% url 'bookings:book_event' event.pk %}" class="btn btn-sm btn-success fw-semibold flex-fill"><i class="bi bi-ticket-perforated"></i> Забронировать</a>
+        {% else %}
+            <a href="{% url 'users:login' %}?next={% url 'bookings:book_event' event.pk %}" class="btn btn-sm btn-success fw-semibold flex-fill"><i class="bi bi-ticket-perforated"></i> Забронировать</a>
+        {% endif %}
+        <a href="{% url 'events:event_detail' event.pk %}" class="btn btn-sm btn-outline-primary fw-semibold flex-fill"><i class="bi bi-arrow-right-circle"></i> Подробнее</a>
     </div>
 </div>
 <script>

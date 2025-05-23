@@ -4,20 +4,30 @@ from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from .forms import ProfileForm, CustomUserCreationForm
+from .forms import ProfileForm, CustomUserCreationForm, CustomAuthenticationForm
 from .models import TelegramConfirmation
 from django.urls import reverse
 from django.conf import settings
 from django.http import HttpResponse
 import qrcode
 from io import BytesIO
+from django.utils.crypto import get_random_string
 
 
 def register_user(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save()
+            user = form.save(commit=False)
+            user.username = get_random_string(10)  # Генерируем уникальный username
+            user.email = form.cleaned_data.get('email', '')
+            user.backend = 'users.backends.EmailOrPhoneBackend'
+            user.save()
+            # Сохраняем профиль
+            profile = user.profile
+            profile.phone = form.cleaned_data.get('phone', '')
+            profile.fullname = form.cleaned_data.get('fullname', '')
+            profile.save()
             # Создаём токен для Telegram подтверждения
             confirmation = TelegramConfirmation.objects.create(user=user)
             login(request, user)  # автоматически залогинить
@@ -80,3 +90,15 @@ def telegram_qr(request):
     qr.save(buffer, format="PNG")
     buffer.seek(0)
     return HttpResponse(buffer.getvalue(), content_type="image/png")
+
+def login_user(request):
+    if request.method == 'POST':
+        form = CustomAuthenticationForm(request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            if user:
+                login(request, user)
+                return redirect(request.GET.get('next') or 'events:event_list')
+    else:
+        form = CustomAuthenticationForm()
+    return render(request, 'registration/login.html', {'form': form})

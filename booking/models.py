@@ -17,6 +17,7 @@ class Booking(models.Model):
     booking_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата бронирования')
     status = models.CharField(max_length=20, choices=BookingStatus.choices, default=BookingStatus.BOOKED)
     is_confirmed = models.BooleanField(default=False)
+    quantity = models.PositiveIntegerField(default=1, verbose_name='Количество билетов')
 
     def __str__(self):
         if self.user:
@@ -24,6 +25,6 @@ class Booking(models.Model):
         return f"{self.user_name or self.user_email} → {self.event.title} [{self.status}]"
 
     class Meta:
-        unique_together = ('user_email', 'event')
+        unique_together = (('user', 'event'),)
         ordering = ['-booking_date']
 
