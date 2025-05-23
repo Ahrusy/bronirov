@@ -13,6 +13,7 @@ urlpatterns = [
     path('', include('booking.urls', namespace='booking')),
     path('users/', include(('users.urls', 'users'), namespace='users')),
     path('bot_api/', include('bot_api.urls')),
+    path('/', include('pages.urls', namespace='pages')), # Статические страницы
 ]
 
 if settings.DEBUG:
