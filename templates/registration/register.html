@@ -2,28 +2,49 @@
 {% block content %}
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <h2 class="mb-4 text-center">Регистрация</h2>
-                    <form method="post">
+        <div class="col-md-7 col-lg-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-stars text-primary" style="font-size: 3rem;"></i>
+                        <h2 class="fw-bold mt-2 mb-1">Создайте аккаунт и бронируйте лучшие события!</h2>
+                        <p class="lead text-secondary mb-3">Быстрое бронирование, персональные рекомендации и управление билетами в одном месте.</p>
+                    </div>
+                    <ul class="list-unstyled mb-4 text-success small text-center">
+                        <li><i class="bi bi-check-circle-fill me-1"></i> Удобное бронирование за 1 минуту</li>
+                        <li><i class="bi bi-check-circle-fill me-1"></i> Доступ к истории и статусу билетов</li>
+                        <li><i class="bi bi-check-circle-fill me-1"></i> Персональные предложения и акции</li>
+                    </ul>
+                    <form method="post" class="mt-3">
                         {% csrf_token %}
-                        {% for field in form %}
-                            <div class="mb-3">
-                                {{ field.label_tag }}
-                                {{ field }}
-                                {% if field.errors %}
-                                    <div class="text-danger small">{{ field.errors|striptags }}</div>
-                                {% endif %}
-                            </div>
-                        {% endfor %}
+                        <div class="mb-3">
+                            {{ form.username.label_tag }}
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                                <div class="text-danger small">{{ form.username.errors|striptags }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.password1.label_tag }}
+                            {{ form.password1 }}
+                            {% if form.password1.errors %}
+                                <div class="text-danger small">{{ form.password1.errors|striptags }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.password2.label_tag }}
+                            {{ form.password2 }}
+                            {% if form.password2.errors %}
+                                <div class="text-danger small">{{ form.password2.errors|striptags }}</div>
+                            {% endif %}
+                        </div>
                         {% if form.non_field_errors %}
                             <div class="alert alert-danger">{{ form.non_field_errors }}</div>
                         {% endif %}
-                        <button type="submit" class="btn btn-primary w-100">Зарегистрироваться</button>
+                        <button type="submit" class="btn btn-lg btn-success w-100 fw-semibold mt-2">Зарегистрироваться бесплатно</button>
                     </form>
-                    <div class="mt-3 text-center">
-                        Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a>
+                    <div class="mt-4 text-center">
+                        Уже есть аккаунт? <a href="{% url 'users:login' %}" class="fw-semibold">Войти</a>
                     </div>
                 </div>
             </div>

@@ -9,15 +9,15 @@
         {% csrf_token %}
         <div class="mb-3">
             <label for="id_user_name" class="form-label">Имя</label>
-            {{ form.user_name|as_widget(attrs={'class': 'form-control'}) }}
+            {{ form.user_name.as_widget(attrs={'class': 'form-control'}) }}
         </div>
         <div class="mb-3">
             <label for="id_user_email" class="form-label">Email</label>
-            {{ form.user_email|as_widget(attrs={'class': 'form-control'}) }}
+            {{ form.user_email.as_widget(attrs={'class': 'form-control'}) }}
         </div>
         <div class="mb-3">
             <label for="id_user_telegram" class="form-label">Telegram (username, опционально)</label>
-            {{ form.user_telegram|as_widget(attrs={'class': 'form-control'}) }}
+            {{ form.user_telegram.as_widget(attrs={'class': 'form-control'}) }}
         </div>
         <button type="submit" class="btn btn-success">Забронировать</button>
     </form>

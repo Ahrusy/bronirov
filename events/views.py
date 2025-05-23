@@ -5,6 +5,7 @@ from .models import Event
 from .forms import EventFilterForm
 import bleach
 from datetime import date, timedelta
+from django.db.models import Q
 
 def event_list(request):
     view_type = request.GET.get('view', request.session.get('view_type', 'card'))
@@ -41,7 +42,10 @@ def event_list(request):
 
     # Категории мероприятий (без фильтра по дате, только limit=7)
     upcoming_events = base_qs.order_by('event_date')[:7]
-    free_events = base_qs.filter(ticket_price=0).order_by('event_date')[:7]
+    free_events = base_qs.filter(
+        (Q(ticket_price=0) | Q(ticket_price__isnull=True)) &
+        (Q(price_text__isnull=True) | Q(price_text__exact='') | Q(price_text__iexact='Бесплатно'))
+    ).order_by('event_date')[:7]
     paid_events = base_qs.filter(ticket_price__gt=0).order_by('event_date')[:7]
     finished_events = base_qs.filter(event_date__lt=today).order_by('-event_date')
 

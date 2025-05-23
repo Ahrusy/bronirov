@@ -1,5 +1,5 @@
 {% load static %}
-{% with event_link=event.url|default:'' %}
+{% with event_link=event.event_url|default:'' %}
     {% if not event_link %}
         {% url 'events:event_detail' event.pk as event_link %}
     {% endif %}
@@ -17,13 +17,19 @@
         </h6>
         {% if event.description %}
             {% with desc=event.description|striptags %}
-                <p class="card-text text-truncate mb-1" style="font-size: 0.93rem;">
+                <p class="card-text mb-1" style="font-size: 0.93rem;">
+                    <span class="desc-short" {% if desc|length <= 80 %}style="display:inline"{% else %}style="display:inline"{% endif %}>
+                        {% if desc|length > 80 %}
+                            {{ desc|slice:"0:80" }}... <a href="#" class="desc-toggle text-primary text-decoration-underline" data-target="desc-{{ event.pk }}">читать полностью</a>
+                        {% else %}
+                            {{ desc }}
+                        {% endif %}
+                    </span>
                     {% if desc|length > 80 %}
-                        {{ desc|slice:"0:80" }}... 
-                    {% else %}
-                        {{ desc }}
+                    <span class="desc-full" id="desc-{{ event.pk }}" style="display:none">
+                        {{ desc }} <a href="#" class="desc-toggle text-primary text-decoration-underline" data-target="desc-{{ event.pk }}">скрыть</a>
+                    </span>
                     {% endif %}
-                    <a href="{{ event_link }}" target="_blank">Подробнее</a>
                 </p>
             {% endwith %}
         {% endif %}
@@ -36,13 +42,33 @@
             <span class="badge bg-success"><i class="bi bi-bookmark"></i> {{ event.genre }}</span>
             {% if event.price_text %}
                 <span class="badge bg-warning text-dark"><i class="bi bi-cash-coin"></i> {{ event.price_text }}</span>
+            {% elif event.ticket_price == 0 or event.ticket_price is None %}
+                <span class="badge bg-success"><i class="bi bi-gift"></i> Бесплатно</span>
             {% else %}
                 <span class="badge bg-warning text-dark"><i class="bi bi-cash-coin"></i> {{ event.ticket_price }} ₽</span>
             {% endif %}
         </div>
     </div>
     <div class="card-footer bg-transparent border-top-0 text-center p-2">
-        <a href="{{ event_link }}" target="_blank" class="btn btn-sm btn-outline-primary w-100 fw-semibold"><i class="bi bi-arrow-right-circle"></i> Подробнее</a>
+        <a href="{% url 'events:event_detail' event.pk %}" class="btn btn-sm btn-outline-primary w-100 fw-semibold"><i class="bi bi-arrow-right-circle"></i> Подробнее</a>
     </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.desc-toggle').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var target = document.getElementById(this.dataset.target);
+            var short = this.closest('p').querySelector('.desc-short');
+            if (target.style.display === 'none') {
+                target.style.display = 'inline';
+                short.style.display = 'none';
+            } else {
+                target.style.display = 'none';
+                short.style.display = 'inline';
+            }
+        });
+    });
+});
+</script>
 {% endwith %} 

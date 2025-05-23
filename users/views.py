@@ -4,19 +4,27 @@ from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from .forms import ProfileForm
+from .forms import ProfileForm, CustomUserCreationForm
+from .models import TelegramConfirmation
+from django.urls import reverse
+from django.conf import settings
+from django.http import HttpResponse
+import qrcode
+from io import BytesIO
 
 
 def register_user(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            # Создаём токен для Telegram подтверждения
+            confirmation = TelegramConfirmation.objects.create(user=user)
             login(request, user)  # автоматически залогинить
             messages.success(request, "Вы успешно зарегистрированы!")
-            return redirect('event_list')
+            return redirect(reverse('users:telegram_confirm'))
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
 
 @login_required
@@ -32,9 +40,43 @@ def edit_profile(request):
     if request.method == 'POST':
         form = ProfileForm(request.POST, instance=profile)
         if form.is_valid():
-            form.save()
+            profile.fullname = form.cleaned_data.get('fullname', '')
+            profile.save()
             messages.success(request, "Профиль обновлён.")
             return redirect('profile')
     else:
-        form = ProfileForm(instance=profile)
+        initial = {
+            'fullname': profile.fullname,
+            'email': request.user.email,
+            'phone': profile.phone,
+            'telegram_chat_id': profile.telegram_chat_id,
+        }
+        form = ProfileForm(instance=profile, initial=initial)
     return render(request, 'registration/edit_profile.html', {'form': form})
+
+def telegram_confirm(request):
+    confirmation = None
+    if request.user.is_authenticated:
+        try:
+            confirmation = request.user.telegram_confirmation
+        except TelegramConfirmation.DoesNotExist:
+            confirmation = TelegramConfirmation.objects.create(user=request.user)
+    return render(request, 'registration/telegram_confirm.html', {
+        'confirmation': confirmation,
+        'telegram_bot_username': getattr(settings, 'TELEGRAM_BOT_USERNAME', 'your_bot_username')
+    })
+
+def telegram_qr(request):
+    if not request.user.is_authenticated:
+        return HttpResponse(status=403)
+    try:
+        confirmation = request.user.telegram_confirmation
+    except TelegramConfirmation.DoesNotExist:
+        return HttpResponse(status=404)
+    bot_username = getattr(settings, 'TELEGRAM_BOT_USERNAME', 'your_bot_username')
+    url = f"https://t.me/{bot_username}?start={confirmation.token}"
+    qr = qrcode.make(url)
+    buffer = BytesIO()
+    qr.save(buffer, format="PNG")
+    buffer.seek(0)
+    return HttpResponse(buffer.getvalue(), content_type="image/png")

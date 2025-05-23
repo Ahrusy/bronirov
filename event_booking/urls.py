@@ -11,7 +11,8 @@ urlpatterns = [
     path('booked/', event_views.booked, name='booked'),
     path('', include('events.urls', namespace='events')),
     path('', include('booking.urls', namespace='booking')),
-    path('users/', include('users.urls')),
+    path('users/', include(('users.urls', 'users'), namespace='users')),
+    path('bot_api/', include('bot_api.urls')),
 ]
 
 if settings.DEBUG:

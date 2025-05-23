@@ -53,7 +53,8 @@ def book_event(request, event_id):
                 if booking.user_telegram:
                     user_message = f'Ваше бронирование на "{event.title}" подтверждено!'
                     send_telegram_notification(user_message, chat_id=booking.user_telegram)
-                return render(request, 'bookings/booking_success.html', {'event': event, 'booking': booking})
+                return render(request, 'booking/booking_success.html', {'event': event, 'booking': booking})
+        # Если форма невалидна, ошибки будут показаны через form.errors
     else:
         form = BookingForm()
     return render(request, 'bookings/book_event.html', {'form': form, 'event': event, 'error_message': error_message})
