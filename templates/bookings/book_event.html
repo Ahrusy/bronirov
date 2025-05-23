@@ -46,7 +46,25 @@
                 {% endif %}
                 <form method="post">
                     {% csrf_token %}
-                    {{ form.as_p }}
+                    <div class="mb-3">
+                        <label class="form-label">ФИО:</label>
+                        <div class="form-control-plaintext">{{ user.profile.fullname }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email:</label>
+                        <div class="form-control-plaintext">{{ user.email }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Telegram:</label>
+                        <div class="form-control-plaintext">{{ user.profile.telegram_chat_id }}</div>
+                    </div>
+                    <div class="mb-3">
+                        {{ form.quantity.label_tag }}
+                        {{ form.quantity }}
+                        {% if form.quantity.errors %}
+                            <div class="text-danger small">{{ form.quantity.errors|striptags }}</div>
+                        {% endif %}
+                    </div>
                     <button type="submit" class="btn btn-lg btn-success w-100 fw-semibold mb-2"><i class="bi bi-ticket-perforated"></i> Забронировать</button>
                     <a href="{% url 'events:event_detail' event.id %}" class="btn btn-outline-secondary w-100">Отмена</a>
                 </form>

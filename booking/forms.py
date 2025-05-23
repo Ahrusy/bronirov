@@ -4,4 +4,6 @@ from .models import Booking
 class BookingForm(forms.ModelForm):
     class Meta:
         model = Booking
-        fields = ['user_name', 'user_email', 'user_telegram'] 
+        fields = ['quantity']
+        labels = {'quantity': 'Количество билетов'}
+        widgets = {'quantity': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 20})} 

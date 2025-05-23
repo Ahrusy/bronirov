@@ -14,10 +14,10 @@
                     <form method="post" class="mt-4">
                         {% csrf_token %}
                         <div class="mb-3">
-                            <label for="id_username" class="form-label">Имя пользователя</label>
-                            {{ form.username }}
-                            {% if form.username.errors %}
-                                <div class="text-danger small">{{ form.username.errors|striptags }}</div>
+                            <label for="id_login" class="form-label">Email или телефон</label>
+                            {{ form.login }}
+                            {% if form.login.errors %}
+                                <div class="text-danger small">{{ form.login.errors|striptags }}</div>
                             {% endif %}
                         </div>
                         <div class="mb-3">

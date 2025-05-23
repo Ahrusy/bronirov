@@ -18,10 +18,24 @@
                     <form method="post" class="mt-3">
                         {% csrf_token %}
                         <div class="mb-3">
-                            {{ form.username.label_tag }}
-                            {{ form.username }}
-                            {% if form.username.errors %}
-                                <div class="text-danger small">{{ form.username.errors|striptags }}</div>
+                            {{ form.fullname.label_tag }}
+                            {{ form.fullname }}
+                            {% if form.fullname.errors %}
+                                <div class="text-danger small">{{ form.fullname.errors|striptags }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.email.label_tag }}
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="text-danger small">{{ form.email.errors|striptags }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.phone.label_tag }}
+                            {{ form.phone }}
+                            {% if form.phone.errors %}
+                                <div class="text-danger small">{{ form.phone.errors|striptags }}</div>
                             {% endif %}
                         </div>
                         <div class="mb-3">
