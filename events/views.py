@@ -31,8 +31,10 @@ def event_list(request):
                 base_qs = base_qs.filter(city__in=cities)
             else:
                 base_qs = base_qs.filter(city=cities)
-        if genres:
+        if hasattr(genres, '__iter__') and not isinstance(genres, str):
             base_qs = base_qs.filter(genre__in=genres)
+        else:
+            base_qs = base_qs.filter(genre=genres)
         if date_from and date_to:
             base_qs = base_qs.filter(event_date__range=(date_from, date_to))
         elif date_from:
