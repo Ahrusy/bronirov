@@ -140,6 +140,7 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_BOT_USERNAME = os.getenv("TELEGRAM_BOT_USERNAME")
 
+# 👤 Пользователи
 LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/users/profile/'
 LOGOUT_REDIRECT_URL = '/'
