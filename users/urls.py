@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import register_user, user_profile, edit_profile
+from .views import register_user, user_profile, edit_profile, telegram_confirm, telegram_qr
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
@@ -8,4 +8,6 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('profile/', user_profile, name='profile'),
     path('profile/edit/', edit_profile, name='edit_profile'),
+    path('telegram-confirm/', telegram_confirm, name='telegram_confirm'),
+    path('telegram-qr/', telegram_qr, name='telegram_qr'),
 ]

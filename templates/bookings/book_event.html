@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Бронирование: {{ event.title }}{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-7 mb-4 mb-lg-0">
+            <div class="card shadow-lg border-0">
+                {% if event.image %}
+                    <img src="{{ event.image.url }}" class="card-img-top img-fluid rounded-top" alt="{{ event.title|escape }}" style="object-fit: cover; max-height: 280px;">
+                {% else %}
+                    <img src="{% static 'img/genre/' %}{{ event.genre.id }}.jpg" class="card-img-top img-fluid rounded-top" style="object-fit: cover; max-height: 280px;" alt="{{ event.title|escape }}">
+                {% endif %}
+                <div class="card-body">
+                    <h2 class="card-title fw-bold text-primary mb-3">{{ event.title }}</h2>
+                    <div class="mb-3 d-flex flex-wrap gap-2">
+                        <span class="badge bg-info text-dark fs-6"><i class="bi bi-calendar-event"></i> {{ event.event_date|date:"d.m.Y" }}</span>
+                        {% if event.start_time %}
+                            <span class="badge bg-secondary fs-6"><i class="bi bi-clock"></i> {{ event.start_time|time:"H:i" }}</span>
+                        {% endif %}
+                        <span class="badge bg-success fs-6"><i class="bi bi-geo-alt"></i> {{ event.city }}</span>
+                        <span class="badge bg-success fs-6"><i class="bi bi-geo"></i> {{ event.location }}</span>
+                        <span class="badge bg-primary fs-6"><i class="bi bi-bookmark"></i> {{ event.genre }}</span>
+                        {% if event.price_text %}
+                            <span class="badge bg-warning text-dark fs-6"><i class="bi bi-cash-coin"></i> {{ event.price_text }}</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark fs-6"><i class="bi bi-cash-coin"></i> {{ event.ticket_price }} ₽</span>
+                        {% endif %}
+                    </div>
+                    {% if event.description %}
+                        <div class="mb-3" style="font-size: 1.05rem;">
+                            {{ event.description|safe }}
+                        </div>
+                    {% endif %}
+                    {% if event.event_url %}
+                        <a href="{{ event.event_url }}" target="_blank" class="btn btn-outline-primary btn-sm mb-2"><i class="bi bi-box-arrow-up-right"></i> Оригинал события</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="card shadow border-0 p-3">
+                <h4 class="mb-3 text-center text-success">Забронируйте своё место!</h4>
+                {% if error_message %}
+                    <div class="alert alert-danger">{{ error_message }}</div>
+                {% endif %}
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-lg btn-success w-100 fw-semibold mb-2"><i class="bi bi-ticket-perforated"></i> Забронировать</button>
+                    <a href="{% url 'events:event_detail' event.id %}" class="btn btn-outline-secondary w-100">Отмена</a>
+                </form>
+                <div class="text-center mt-3">
+                    <small class="text-muted">После бронирования вы получите подтверждение на email или в личном кабинете.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

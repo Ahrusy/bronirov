@@ -1,54 +1,54 @@
 <!-- templates/events/event_detail.html -->
 {% extends "base.html" %}
 {% load static %}
-{% block content %}
-<div class="container my-5">
-    <div class="row">
-        <div class="col-12">
-            <div class="d-flex align-items-start">
-                {% if event.image %}
-                <img src="{{ event.image.url }}" class="float-start me-3 img-fluid" alt="{{ event.title|escape }}"
-                     style="max-width: 300px; object-fit: cover;">
-                {% else %}
-                {% if event.genre and event.genre.id %}
-                <img src="{% static 'img/genre/' %}{{ event.genre.id }}.jpg" class="float-start me-3 img-fluid"
-                     alt="{{ event.title|escape }}" style="max-width: 300px; object-fit: cover;">
-                {% else %}
-                <img src="{% static 'img/genre/11.jpg' %}" class="float-start me-3 img-fluid"
-                     alt="{{ event.title|escape }}" style="max-width: 300px; object-fit: cover;">
-                {% endif %}
-                {% endif %}
-                <div>
-                    <h1 class="h2 mb-3">{{ event.title }}</h1>
-                    <p class="lead">{{ event.description|safe }}</p>
-                    <ul class="list-unstyled">
-                        <li><strong>Дата:</strong> {{ event.event_date|date:"d.m.Y" }}</li>
-                        <li><strong>Город:</strong> {{ event.location.city.name }}</li>
-                        <li><strong>Место:</strong> {{ event.location.name }}</li>
-                        <li><strong>Жанр:</strong> {{ event.genre }}</li>
-                        <li><strong>Цена:</strong> {{ event.ticket_price }} ₽</li>
-                        <li><strong>Билетов осталось:</strong> {{ event.available_tickets }}</li>
-                    </ul>
 
+{% block title %}{{ event.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0 mb-4">
+                {% if event.image %}
+                    <img src="{{ event.image.url }}" class="card-img-top img-fluid rounded-top" alt="{{ event.title|escape }}" style="object-fit: cover; max-height: 340px;">
+                {% else %}
+                    <img src="{% static 'img/genre/' %}{{ event.genre.id }}.jpg" class="card-img-top img-fluid rounded-top" style="object-fit: cover; max-height: 340px;" alt="{{ event.title|escape }}">
+                {% endif %}
+                <div class="card-body">
+                    <h1 class="card-title fw-bold text-primary mb-3" style="font-size: 2rem;">{{ event.title }}</h1>
+                    <div class="mb-3 d-flex flex-wrap gap-2">
+                        <span class="badge bg-info text-dark fs-6"><i class="bi bi-calendar-event"></i> {{ event.event_date|date:"d.m.Y" }}</span>
+                        {% if event.start_time %}
+                            <span class="badge bg-secondary fs-6"><i class="bi bi-clock"></i> {{ event.start_time|time:"H:i" }}</span>
+                        {% endif %}
+                        <span class="badge bg-success fs-6"><i class="bi bi-geo-alt"></i> {{ event.city }}</span>
+                        <span class="badge bg-success fs-6"><i class="bi bi-geo"></i> {{ event.location }}</span>
+                        <span class="badge bg-primary fs-6"><i class="bi bi-bookmark"></i> {{ event.genre }}</span>
+                        {% if event.price_text %}
+                            <span class="badge bg-warning text-dark fs-6"><i class="bi bi-cash-coin"></i> {{ event.price_text }}</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark fs-6"><i class="bi bi-cash-coin"></i> {{ event.ticket_price }} ₽</span>
+                        {% endif %}
+                    </div>
+                    {% if event.description %}
+                        <div class="mb-4" style="font-size: 1.1rem;">
+                            {{ event.description|safe }}
+                        </div>
+                    {% endif %}
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <a href="{% url 'bookings:book_event' event.id %}" class="btn btn-lg btn-success fw-semibold"><i class="bi bi-ticket-perforated"></i> Забронировать</a>
+                        {% if event.event_url %}
+                            <a href="{{ event.event_url }}" target="_blank" class="btn btn-lg btn-outline-primary fw-semibold"><i class="bi bi-box-arrow-up-right"></i> Оригинал события</a>
+                        {% endif %}
+                    </div>
+                    {% if event.rules %}
+                        <div class="alert alert-info mt-3"><i class="bi bi-info-circle"></i> {{ event.rules|safe }}</div>
+                    {% endif %}
                 </div>
             </div>
-            {% if event.rules %}
-            <p><strong>Правила:</strong> {{ event.rules|safe }}</p>
-            {% endif %}
-            {% if event.event_url %}
-            <p><a href="{{ event.event_url }}" target="_blank">Страница мероприятия</a></p>
-            {% endif %}
-
-            <form action="{% url 'bookings:book_event' event.id %}" method="post">
-                {% csrf_token %}
-                <label>Имя: <input type="text" name="user_name" required></label><br>
-                <label>Email: <input type="email" name="user_email" required></label><br>
-                <label>Telegram: <input type="text" name="user_telegram"></label><br>
-                <button type="submit">Забронировать</button>
-            </form>
-
-
-            <a href="{% url 'events:event_list' %}" class="btn btn-outline-primary mt-3">Назад к списку</a>
+            <div class="text-center mt-3">
+                <a href="{% url 'events:event_list' %}" class="btn btn-link"><i class="bi bi-arrow-left-circle"></i> Назад к афише</a>
+            </div>
         </div>
     </div>
 </div>

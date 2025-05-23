@@ -1,0 +1,24 @@
+<form method="get" class="p-2 border rounded-3 bg-white shadow-sm mb-2">
+    <div class="row g-2 align-items-end flex-nowrap">
+        <div class="col-auto" style="min-width: 180px;">
+            <label for="{{ form.cities.id_for_label }}" class="form-label mb-1 small">Город</label>
+            {{ form.cities }}
+        </div>
+        <div class="col-auto" style="min-width: 180px;">
+            <label for="{{ form.genres.id_for_label }}" class="form-label mb-1 small">Жанр</label>
+            {{ form.genres }}
+        </div>
+        <div class="col-auto" style="min-width: 120px;">
+            <label for="{{ form.date_from.id_for_label }}" class="form-label mb-1 small">Дата от</label>
+            {{ form.date_from }}
+        </div>
+        <div class="col-auto" style="min-width: 120px;">
+            <label for="{{ form.date_to.id_for_label }}" class="form-label mb-1 small">Дата до</label>
+            {{ form.date_to }}
+        </div>
+        <div class="col-auto d-flex align-items-end gap-2">
+            <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-search"></i></button>
+            <a href="{% url 'events:event_list' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-x-circle"></i></a>
+        </div>
+    </div>
+</form> 

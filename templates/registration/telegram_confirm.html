@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Подтверждение Telegram{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-4 text-center">
+                    <i class="bi bi-telegram text-info" style="font-size: 3rem;"></i>
+                    <h2 class="fw-bold mt-2 mb-3">Подтвердите Telegram</h2>
+                    <p class="lead text-secondary mb-4">Для завершения регистрации подтвердите свой Telegram-аккаунт. Это позволит получать уведомления о бронированиях и напоминания о событиях прямо в Telegram!</p>
+                    {% if confirmation %}
+                        <div class="mb-3">
+                            <p>1. Откройте Telegram и отсканируйте QR-код:</p>
+                            <img src="{% url 'users:telegram_qr' %}" alt="QR для Telegram" class="mb-2"/>
+                            <p class="small text-muted">Или перейдите по ссылке:</p>
+                            <a href="https://t.me/{{ telegram_bot_username }}?start={{ confirmation.token }}" class="btn btn-info mb-3" target="_blank">Перейти в Telegram-бота</a>
+                        </div>
+                        <div class="alert alert-warning small">После подтверждения Telegram вы получите доступ ко всем функциям сайта!</div>
+                    {% else %}
+                        <div class="alert alert-danger">Ошибка генерации токена. Попробуйте позже.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

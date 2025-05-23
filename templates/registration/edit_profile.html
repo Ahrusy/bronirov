@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Редактировать профиль{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">Редактировать профиль</h2>
+    <form method="post" enctype="multipart/form-data" class="card p-4 shadow-sm mx-auto" style="max-width: 500px;">
+        {% csrf_token %}
+        <div class="mb-3">
+            {{ form.fullname.label_tag }}
+            {{ form.fullname }}
+        </div>
+        <div class="mb-3">
+            {{ form.email.label_tag }}
+            {{ form.email }}
+        </div>
+        <div class="mb-3">
+            {{ form.phone.label_tag }}
+            {{ form.phone }}
+        </div>
+        <div class="mb-3">
+            {{ form.telegram_chat_id.label_tag }}
+            {{ form.telegram_chat_id }}
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Сохранить изменения</button>
+        <a href="{% url 'users:profile' %}" class="btn btn-link mt-3">Отмена</a>
+    </form>
+</div>
+{% endblock %} 

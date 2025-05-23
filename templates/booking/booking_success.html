@@ -2,11 +2,20 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Бронирование успешно!</h1>
-
-<p>Спасибо, {{ booking.user_name }}!</p>
-<p>Вы забронировали: <strong>{{ event.title }}</strong> на {{ event.event_date }}</p>
-<p>Мы отправим информацию на ваш email: {{ booking.user_email }}</p>
-
-<a href="{% url 'events:event_list' %}">← Вернуться к мероприятиям</a>
+<div class="container mt-5">
+    <div class="alert alert-success">
+        <h4>Спасибо за бронирование!</h4>
+        <p>Ваше бронирование на <strong>{{ event.title }}</strong> успешно подтверждено.</p>
+        <ul>
+            <li>Дата: {{ event.event_date }}</li>
+            <li>Место: {{ event.location }}</li>
+            <li>Город: {{ event.city }}</li>
+        </ul>
+        <p>Подтверждение отправлено на email: <strong>{{ booking.user_email }}</strong></p>
+        {% if booking.user_telegram %}
+        <p>Уведомление отправлено в Telegram: <strong>{{ booking.user_telegram }}</strong></p>
+        {% endif %}
+        <a href="/" class="btn btn-primary mt-3">На главную</a>
+    </div>
+</div>
 {% endblock %}
