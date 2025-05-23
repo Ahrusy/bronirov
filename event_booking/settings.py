@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'bot_api',
     # 🔄 Импорт событий
     'event_importer',
+    # статические страницы
+    'pages',
 ]
 
 MIDDLEWARE = [

@@ -5,6 +5,7 @@ to maintain consistency in templates and views.
 """
 
 import datetime
+from django.urls import reverse, NoReverseMatch
 
 # Shared site data
 SITE_INFO = {
@@ -24,9 +25,9 @@ DEFAULT_MENU = [
 FOOTER_INFO = {
     'description': 'Система бронирования мероприятий',
     'links': [
-        {'title': 'Политика конфиденциальности', 'url': '/privacy/'},
-        {'title': 'Условия использования', 'url': '/terms/'},
-        {'title': 'Карта сайта', 'url': '/sitemap/'},
+        {'title': 'Политика конфиденциальности', 'url_name': 'pages:privacy'},
+        {'title': 'Условия использования', 'url_name': 'pages:terms'},
+        {'title': 'Карта сайта', 'url_name': 'pages:sitemap'},
     ],
     'address': 'ул. Примерная, 12, г. Москва',
     'phone': '+7987 51234567',
@@ -60,13 +61,20 @@ def get_base_context(request):
                 item['active'] = request.path == item['url']
             else:
                 item['active'] = ( request.path.startswith(item['url']))
+    footer = FOOTER_INFO.copy()
 
+    for item in footer['links']:
+        try:
+            item['url'] = reverse(item['url_name'])
+        except NoReverseMatch:
+            item['url'] = item['url_name']
+        print(item)
 
     # Create base context
     context = {
         **SITE_INFO,
         'menu_items': menu_items,
-        'footer': FOOTER_INFO,
+        'footer': footer,
     }
 
     return context
